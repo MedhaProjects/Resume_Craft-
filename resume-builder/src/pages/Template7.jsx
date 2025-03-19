@@ -86,51 +86,51 @@ const ResumeTemplate = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-lg p-8 border rounded-lg font-sans">
+    <div className="max-w-4xl mx-auto bg-white shadow-lg p-8 border rounded-lg font-sans text-black">
       {/* Name & Title Section */}
       <div className="flex flex-col border-b pb-4 mb-4">
         <input
           type="text"
           value={data.name}
           onChange={(e) => handleChange("name", null, null, e)}
-          className="text-3xl font-bold text-blue-700 w-full"
+          className="text-3xl font-bold text-black w-full"
         />
         <input
           type="text"
           value={data.title}
           onChange={(e) => handleChange("title", null, null, e)}
-          className="text-lg text-gray-600 w-full mt-2"
+          className="text-lg text-black w-full mt-2"
         />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         {/* Contact & Education Section */}
         <div className="col-span-1 bg-gray-100 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold border-b pb-2 mb-2">Contact</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 mb-2 text-black">Contact</h2>
           {Object.entries(data.contact).map(([key, value]) => (
             <input
               key={key}
               type="text"
               value={value}
               onChange={(e) => handleChange("contact", key, null, e)}
-              className="w-full mt-1"
+              className="w-full mt-1 text-black"
             />
           ))}
 
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4">Education</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Education</h2>
           {data.education.map((edu, index) => (
             <div key={index} className="mt-2">
               <input
                 type="text"
                 value={`${edu.year} - ${edu.university} (${edu.degree})`}
                 onChange={(e) => handleChange("education", "degree", index, e)}
-                className="w-full"
+                className="w-full text-black"
               />
             </div>
           ))}
 
           {/* Skills Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4">Skills</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Skills</h2>
           <ul>
             {data.skills.map((skill, index) => (
               <li key={index} className="mt-1">
@@ -138,46 +138,46 @@ const ResumeTemplate = () => {
                   type="text"
                   value={skill}
                   onChange={(e) => handleChange("skills", index, null, e)}
-                  className="w-full"
+                  className="w-full text-black"
                 />
               </li>
             ))}
           </ul>
 
           {/* Languages Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4">Languages</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Languages</h2>
           {Object.entries(data.languages).map(([language, level], index) => (
             <div key={index} className="mt-1">
               <input
                 type="text"
                 value={`${language}: ${level}`}
                 onChange={(e) => handleChange("languages", language, null, e)}
-                className="w-full"
+                className="w-full text-black"
               />
             </div>
           ))}
 
           {/* References Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4">References</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">References</h2>
           {data.references.map((ref, index) => (
             <div key={index} className="mt-2">
               <input
                 type="text"
                 value={`${ref.name} - ${ref.position}`}
                 onChange={(e) => handleChange("references", "name", index, e)}
-                className="w-full"
+                className="w-full text-black"
               />
               <input
                 type="text"
                 value={ref.phone}
                 onChange={(e) => handleChange("references", "phone", index, e)}
-                className="w-full mt-1"
+                className="w-full mt-1 text-black"
               />
               <input
                 type="text"
                 value={ref.email}
                 onChange={(e) => handleChange("references", "email", index, e)}
-                className="w-full mt-1"
+                className="w-full mt-1 text-black"
               />
             </div>
           ))}
@@ -185,14 +185,14 @@ const ResumeTemplate = () => {
 
         {/* Work Experience Section */}
         <div className="col-span-2">
-          <h2 className="text-xl font-semibold border-b pb-2">Work Experience</h2>
+          <h2 className="text-xl font-semibold border-b pb-2 text-black">Work Experience</h2>
           {data.workExperience.map((job, index) => (
             <div key={index} className="mt-4">
               <input
                 type="text"
                 value={`${job.company} (${job.period}) - ${job.role}`}
                 onChange={(e) => handleChange("workExperience", "role", index, e)}
-                className="w-full font-bold"
+                className="w-full font-bold text-black"
               />
               {job.responsibilities.map((task, idx) => (
                 <input
@@ -207,7 +207,7 @@ const ResumeTemplate = () => {
                       return updatedData;
                     });
                   }}
-                  className="w-full mt-1"
+                  className="w-full mt-1 text-black"
                 />
               ))}
             </div>

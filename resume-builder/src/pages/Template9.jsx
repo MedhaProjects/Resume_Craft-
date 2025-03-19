@@ -88,7 +88,7 @@ const ResumeTemplate = () => {
   return (
     <div className="flex space-x-4">
       {/* Form Section */}
-      <div className="flex-1 bg-white shadow-lg p-8 border rounded-lg font-sans">
+      <div className="flex-1 text-black bg-white shadow-lg p-8 border rounded-lg font-sans">
         <h2 className="text-2xl font-semibold">Edit Resume</h2>
 
         {/* Name */}
@@ -245,7 +245,7 @@ const ResumeTemplate = () => {
       </div>
 
       {/* Preview Section */}
-      <div className="flex-1 bg-white shadow-lg p-8 border rounded-lg font-sans">
+      <div className="flex-1 bg-white text-black shadow-lg p-8 border rounded-lg font-sans">
         <h1 className="text-3xl font-bold">{data.name}</h1>
         <h2 className="text-lg font-semibold text-gray-600">{data.title}</h2>
         <p className="text-gray-700 mt-2">{data.contact}</p>

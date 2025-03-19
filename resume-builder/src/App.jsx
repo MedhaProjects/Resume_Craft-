@@ -21,7 +21,7 @@ import Template6 from "./pages/Template6";
 import Template7 from "./pages/Template7";
 import Template8 from "./pages/Template8";
 import Template9 from "./pages/Template9";
-
+import Template10 from "./pages/Template10";
 const App = () => {
   return (
     <Router>
@@ -51,6 +51,7 @@ const App = () => {
           <Route path="/template7" element={<Template7 />} />
           <Route path="/template8" element={<Template8 />} />
           <Route path="/template9" element={<Template9 />} />
+          <Route path="/template10" element={<Template10 />} />
         </Routes>
 
         <Footer />

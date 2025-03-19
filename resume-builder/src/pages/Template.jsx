@@ -6,14 +6,14 @@ import { auth } from "../firebase"; // Firebase import for authentication
 import { onAuthStateChanged } from "firebase/auth";
 
 const templates = [
-  { id: 1, name: "Basic", image: "/r1.jpg", path: "/template1", isPremium: false },
-  { id: 2, name: "Creative", image: "/r2.jpg", path: "/template2", isPremium: false },
-  { id: 3, name: "Professional", image: "/r1.jpg", path: "/template3", isPremium: false },
-  { id: 4, name: "Fresher", image: "/r1.jpg", path: "/template4", isPremium: false },
-  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template5", isPremium: false },
-  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template6", isPremium: true },
-  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template7", isPremium: true },
-  { id: 8, name: "Final", image: "/r1.jpg", path: "/template8", isPremium: true },
+  { id: 1, name: "Basic", image: "/r1.jpg", path: "/template5", isPremium: false },
+  { id: 2, name: "Creative", image: "/r2.jpg", path: "/template10", isPremium: false },
+  { id: 3, name: "Professional", image: "/r1.jpg", path: "/template7", isPremium: false },
+  { id: 4, name: "Fresher", image: "/r1.jpg", path: "/template9", isPremium: false },
+  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: true },
+  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: true },
+  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: true },
+  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: true },
 ];
 const filters = ["all", "free", "premium", "fresher", "experience", "creative"];
 

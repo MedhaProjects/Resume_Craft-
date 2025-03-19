@@ -5,6 +5,7 @@ const ResumeEditor = () => {
     name: "Daniel Gallego",
     contact: "hello@reallygreatsite.com | 123 Anywhere St., Any City",
     website: "www.reallygreatsite.com",
+    websiteText: "My Portfolio",
     title: "UX Designer",
     summary:
       "UX Designer with a focus on delivering impactful results, eager to tackle dynamic challenges and apply creativity to craft intuitive user experiences. Demonstrated proficiency in project management, user-centric problem-solving, and seamless collaboration across teams. Skilled in leveraging state-of-the-art tools and methodologies to streamline processes and elevate user satisfaction.",
@@ -44,15 +45,15 @@ const ResumeEditor = () => {
   return (
     <div className="flex gap-8 max-w-6xl mx-auto p-8 text-left">
       <div className="w-1/2 bg-gray-100 p-4 rounded-md">
-        <h2 className="text-lg font-bold">Edit Resume</h2>
+        <h2 className="text-lg font-bold text-black">Edit Resume</h2>
         {Object.entries(resume).map(([field, value]) => (
           Array.isArray(value) ? (
             <div key={field} className="mt-4">
-              <h3 className="text-md font-bold capitalize">{field}</h3>
+              <h3 className="text-md font-bold text-black capitalize">{field}</h3>
               {value.map((item, index) => (
                 <div key={index} className="flex items-center gap-2 mt-2">
                   <input
-                    className="w-full border p-2"
+                    className="w-full border p-2 bg-black text-white"
                     value={item}
                     onChange={(e) => handleArrayChange(e, field, index)}
                   />
@@ -72,10 +73,10 @@ const ResumeEditor = () => {
               </button>
             </div>
           ) : (
-            <label key={field} className="block mt-4 capitalize">
+            <label key={field} className="block mt-4 capitalize text-black">
               {field}:
               <input
-                className="w-full border p-2"
+                className="w-full border p-2 bg-black text-white"
                 value={value}
                 onChange={(e) => handleChange(e, field)}
               />
@@ -87,8 +88,12 @@ const ResumeEditor = () => {
         <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
         <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
         <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
-        <p className="text-gray-700 text-sm font-medium">{resume.website}</p>
-        {Object.entries(resume).slice(4).map(([field, value]) => (
+        <p className="text-gray-700 text-sm font-medium">
+          <a href={`https://${resume.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+            {resume.websiteText}
+          </a>
+        </p>
+        {Object.entries(resume).slice(5).map(([field, value]) => (
           <section key={field} className="mt-6">
             <h2 className="text-md font-bold text-blue-700 uppercase border-b pb-1 capitalize">{field}</h2>
             {Array.isArray(value) ? (
