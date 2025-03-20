@@ -1,324 +1,352 @@
 import React, { useState } from "react";
-import { jsPDF } from "jspdf";
 
-const Template4 = () => {
-  const [formData, setFormData] = useState({
-    name: "Jane Smith",
-    title: "Marketing Manager",
-    email: "jane.smith@example.com",
-    phone: "(123) 456-7890",
-    linkedin: "",
-    portfolio: "",
+const ResumeTemplate = () => {
+  const [data, setData] = useState({
+    name: "",
+    title: "",
+    contact: "",
+    email: "",
     summary: "",
-    experienceHeading: "Experience",
-    educationHeading: "Education",
-    skillsHeading: "Skills",
-    certificationsHeading: "Certifications",
-    projectsHeading: "Projects",
-    achievementsHeading: "Achievements",
-    experience: [""],
-    education: [""],
     skills: [""],
-    certifications: [""],
-    projects: [""],
+    projects: [{ title: "", description: "", duration: "" }],
+    education: [{ degree: "", institution: "", year: "" }],
+    certificates: [""],
     achievements: [""],
-    photo: null, // Added photo field
+    languages: [""],
   });
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+  // Handle simple input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
   };
 
-  const handleArrayChange = (field, index, value) => {
-    const updatedArray = [...formData[field]];
-    updatedArray[index] = value;
-    setFormData({ ...formData, [field]: updatedArray });
+  // Handle changes for array inputs
+  const handleArrayChange = (index, e, field, subfield) => {
+    const { value } = e.target;
+    const updatedArray = [...data[field]];
+    updatedArray[index] = subfield
+      ? { ...updatedArray[index], [subfield]: value }
+      : value;
+    setData({ ...data, [field]: updatedArray });
   };
 
-  const addArrayItem = (field) => {
-    setFormData({
-      ...formData,
-      [field]: [...formData[field], ""],
-    });
+  // Add new empty array field
+  const addArrayField = (field) => {
+    const newField =
+      field === "projects"
+        ? { title: "", description: "", duration: "" }
+        : field === "education"
+        ? { degree: "", institution: "", year: "" }
+        : field === "certificates" || field === "achievements" || field === "languages"
+        ? ""
+        : "";
+    setData({ ...data, [field]: [...data[field], newField] });
   };
 
-  const removeArrayItem = (field, index) => {
-    const updatedArray = formData[field].filter((_, i) => i !== index);
-    setFormData({ ...formData, [field]: updatedArray });
-  };
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, photo: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const downloadResume = () => {
-    const doc = new jsPDF();
-    const margin = 10;
-    const lineHeight = 10;
-    const startY = 10;
-
-    doc.setFont("helvetica", "normal");
-
-    let currentY = startY;
-
-    // Name and Title
-    doc.setFontSize(22);
-    doc.text(formData.name, margin, currentY);
-    currentY += lineHeight * 2;
-    doc.setFontSize(16);
-    doc.text(formData.title, margin, currentY);
-    currentY += lineHeight * 2;
-
-    // Contact Info
-    doc.setFontSize(12);
-    doc.text(`Email: ${formData.email}`, margin, currentY);
-    currentY += lineHeight;
-    doc.text(`Phone: ${formData.phone}`, margin, currentY);
-    if (formData.linkedin) {
-      currentY += lineHeight;
-      doc.text(`LinkedIn: ${formData.linkedin}`, margin, currentY);
-    }
-    if (formData.portfolio) {
-      currentY += lineHeight;
-      doc.text(`Portfolio: ${formData.portfolio}`, margin, currentY);
-    }
-    currentY += lineHeight;
-
-    // Summary
-    if (formData.summary) {
-      doc.setFontSize(14);
-      doc.text("Summary", margin, currentY);
-      currentY += lineHeight;
-      doc.setFontSize(12);
-      doc.text(formData.summary, margin, currentY);
-      currentY += lineHeight * 2;
-    }
-
-    // Experience Section
-    doc.setFontSize(14);
-    doc.text(formData.experienceHeading, margin, currentY);
-    currentY += lineHeight;
-    doc.setFontSize(12);
-    formData.experience.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Education Section
-    doc.setFontSize(14);
-    doc.text(formData.educationHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.education.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Skills Section
-    doc.setFontSize(14);
-    doc.text(formData.skillsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.skills.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Certifications Section
-    doc.setFontSize(14);
-    doc.text(formData.certificationsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.certifications.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Projects Section
-    doc.setFontSize(14);
-    doc.text(formData.projectsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.projects.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Achievements Section
-    doc.setFontSize(14);
-    doc.text(formData.achievementsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.achievements.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    doc.save("resume.pdf");
+  // Remove a field from an array
+  const removeArrayField = (field, index) => {
+    const updatedArray = [...data[field]];
+    updatedArray.splice(index, 1);
+    setData({ ...data, [field]: updatedArray });
   };
 
   return (
-    <div className="flex gap-6 p-6 max-w-5xl mx-auto text-black">
-      <div className="w-1/2 bg-gray-100 p-4 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Edit Details</h2>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Full Name"
-        />
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Job Title"
-        />
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Email"
-        />
-        <input
-          type="text"
-          value={formData.phone}
-          onChange={(e) => handleChange("phone", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Phone"
-        />
-        <input
-          type="url"
-          value={formData.linkedin}
-          onChange={(e) => handleChange("linkedin", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="LinkedIn URL"
-        />
-        <input
-          type="url"
-          value={formData.portfolio}
-          onChange={(e) => handleChange("portfolio", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Portfolio URL"
-        />
-        <textarea
-          value={formData.summary}
-          onChange={(e) => handleChange("summary", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Summary"
-        ></textarea>
+    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen">
+      {/* Input Section */}
+      <div className="w-1/2 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
+        <h2 className="text-xl font-bold mb-4 text-center">
+          Enter Resume Details
+        </h2>
 
-        {/* Photo Upload Section */}
-        <div className="mb-4">
-          <label className="block mb-2 font-semibold">Upload Profile Photo</label>
+        {/* Basic Info */}
+        {["name", "title", "contact", "email"].map((field) => (
           <input
-            type="file"
-            onChange={handlePhotoChange}
-            className="w-full p-2 border rounded mb-2"
+            key={field}
+            name={field}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={data[field]}
+            onChange={handleChange}
+            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-          {formData.photo && (
-            <img
-              src={formData.photo}
-              alt="Profile"
-              className="w-32 h-32 object-cover rounded-full mt-2"
-            />
-          )}
-        </div>
+        ))}
 
-        {["experience", "education", "skills", "certifications", "projects", "achievements"].map((field) => (
-          <div key={field} className="mb-4">
-            <input
-              type="text"
-              value={formData[`${field}Heading`]}
-              onChange={(e) => handleChange(`${field}Heading`, e.target.value)}
-              className="w-full p-2 border rounded mb-2 text-black font-bold"
-              placeholder={`Heading for ${field}`}
-            />
-            {formData[field].map((item, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={item}
-                  onChange={(e) => handleArrayChange(field, index, e.target.value)}
-                  className="w-full p-2 border rounded text-black"
-                  placeholder={`Add ${field} details`}
-                />
-                <button
-                  onClick={() => removeArrayItem(field, index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Remove
-                </button>
-              </div>
+        {/* Summary */}
+        <textarea
+          name="summary"
+          placeholder="Summary"
+          value={data.summary}
+          onChange={handleChange}
+          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+
+        {/* Projects Section */}
+        <h3 className="font-semibold mt-4 text-lg">Projects</h3>
+        {data.projects.map((proj, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["title", "description", "duration"].map((field) => (
+              <input
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={proj[field]}
+                onChange={(e) => handleArrayChange(index, e, "projects", field)}
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
             ))}
             <button
-              onClick={() => addArrayItem(field)}
-              className="bg-blue-500 text-white px-3 py-1 rounded"
+              onClick={() => removeArrayField("projects", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
             >
-              Add {field} item
+              ✕ Remove
             </button>
           </div>
         ))}
         <button
-          onClick={downloadResume}
-          className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+          onClick={() => addArrayField("projects")}
+          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
         >
-          Download Resume as PDF
+          + Add Project
+        </button>
+
+        {/* Education Section */}
+        <h3 className="font-semibold mt-4 text-lg">Education</h3>
+        {data.education.map((edu, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["degree", "institution", "year"].map((field) => (
+              <input
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={edu[field]}
+                onChange={(e) => handleArrayChange(index, e, "education", field)}
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            ))}
+            <button
+              onClick={() => removeArrayField("education", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("education")}
+          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Education
+        </button>
+
+        {/* Skills Section */}
+        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
+        {data.skills.map((skill, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={skill}
+              onChange={(e) => handleArrayChange(index, e, "skills")}
+              placeholder="Skill"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => removeArrayField("skills", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("skills")}
+          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Skill
+        </button>
+
+        {/* Certificates Section */}
+        <h3 className="font-semibold mt-4 text-lg">Certificates</h3>
+        {data.certificates.map((cert, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={cert}
+              onChange={(e) => handleArrayChange(index, e, "certificates")}
+              placeholder="Certificate"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+            <button
+              onClick={() => removeArrayField("certificates", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("certificates")}
+          className="bg-teal-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Certificate
+        </button>
+
+        {/* Achievements Section */}
+        <h3 className="font-semibold mt-4 text-lg">Achievements</h3>
+        {data.achievements.map((ach, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={ach}
+              onChange={(e) => handleArrayChange(index, e, "achievements")}
+              placeholder="Achievement"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button
+              onClick={() => removeArrayField("achievements", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("achievements")}
+          className="bg-indigo-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Achievement
+        </button>
+
+        {/* Languages Section */}
+        <h3 className="font-semibold mt-4 text-lg">Languages</h3>
+        {data.languages.map((lang, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={lang}
+              onChange={(e) => handleArrayChange(index, e, "languages")}
+              placeholder="Language"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+            <button
+              onClick={() => removeArrayField("languages", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("languages")}
+          className="bg-orange-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Language
         </button>
       </div>
 
-      <div className="w-1/2 p-6 border rounded-lg bg-white shadow-md text-black">
-        <header className="text-center mb-4">
-          <h1 className="text-4xl font-bold">{formData.name}</h1>
-          <p className="text-lg">{formData.title}</p>
-          <p className="text-md">Email: {formData.email} | Phone: {formData.phone}</p>
-          {formData.linkedin && (
-            <p className="text-md">
-              <a href={formData.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                LinkedIn
-              </a>
-            </p>
-          )}
-          {formData.portfolio && (
-            <p className="text-md">
-              <a href={formData.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                Portfolio
-              </a>
-            </p>
-          )}
-        </header>
-        {formData.photo && (
-          <div className="text-center mb-4">
-            <img
-              src={formData.photo}
-              alt="Profile"
-              className="w-32 h-32 object-cover rounded-full mx-auto"
-            />
-          </div>
-        )}
-        {formData.summary && (
-          <section className="mt-4">
-            <h2 className="text-2xl font-semibold">Summary</h2>
-            <p>{formData.summary}</p>
-          </section>
-        )}
-        {["experience", "education", "skills", "certifications", "projects", "achievements"].map((field) => (
-          <section key={field} className="mt-4">
-            <h2 className="text-2xl font-semibold">{formData[`${field}Heading`]}</h2>
-            <ul className="list-disc pl-5">
-              {formData[field].map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+      {/* Resume Preview Section */}
+      <div
+        className="w-1/2 bg-white text-black p-10 shadow-lg rounded-2xl border border-gray-300"
+        style={{
+          width: "210mm", // A4 width
+          height: "297mm", // A4 height
+          overflowY: "auto",
+        }}
+      >
+        {/* Header */}
+        <div className="border-b pb-6 mb-8 text-center">
+          <h1 className="text-4xl font-bold text-blue-700">{data.name || "John Doe"}</h1>
+          <h2 className="text-lg text-gray-600 mt-1">{data.title || "Software Engineer"}</h2>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+            {data.contact || "123 Main St, City | johndoe@gmail.com"} <br />
+            {data.email || "johndoe@gmail.com"}
+          </p>
+        </div>
+
+        {/* Summary */}
+        <div className="mb-8 bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="font-semibold text-lg text-blue-700 mb-2">Summary</h3>
+          <p className="text-gray-700 leading-relaxed">{data.summary || "Summary will appear here..."}</p>
+        </div>
+
+        {/* Projects */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Projects</h3>
+          {data.projects.map((proj, index) => (
+            <div
+              key={index}
+              className="mb-4 p-5 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <p className="font-semibold text-md text-gray-800">{proj.title}</p>
+              <p className="text-sm text-gray-500">{proj.duration}</p>
+              <p className="text-gray-700">{proj.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Education */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Education</h3>
+          {data.education.map((edu, index) => (
+            <div
+              key={index}
+              className="mb-4 p-5 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
+              <p className="text-sm text-gray-500">{edu.institution}</p>
+              <p className="text-gray-700 text-sm">{edu.year}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Skills */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Skills</h3>
+          <ul className="flex flex-wrap gap-2 text-gray-700">
+            {data.skills.map((skill, index) => (
+              <li
+                key={index}
+                className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-gray-300"
+              >
+                {skill || "Skill"}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Certificates */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Certificates</h3>
+          <ul className="list-disc pl-5 text-gray-700">
+            {data.certificates.map((cert, index) => (
+              <li key={index} className="text-sm">{cert || "Certificate"}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Achievements */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Achievements</h3>
+          <ul className="list-disc pl-5 text-gray-700">
+            {data.achievements.map((ach, index) => (
+              <li key={index} className="text-sm">{ach || "Achievement"}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Languages */}
+        <div className="mb-8">
+          <h3 className="font-semibold text-lg text-blue-700 mb-4">Languages</h3>
+          <ul className="list-disc pl-5 text-gray-700">
+            {data.languages.map((lang, index) => (
+              <li key={index} className="text-sm">{lang || "Language"}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Template4;
+export default ResumeTemplate;
