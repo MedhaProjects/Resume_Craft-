@@ -1,163 +1,188 @@
 import React, { useState } from "react";
-import { jsPDF } from "jspdf";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const ResumeEditor = () => {
-  const defaultFormData = {
-    name: "John Doe",
-    jobTitle: "Software Engineer",
+  const [resume, setResume] = useState({
+    name: "Daniel Gallego",
+    contact: "hello@reallygreatsite.com | 123 Anywhere St., Any City",
+    website: "www.reallygreatsite.com",
+    websiteText: "My Portfolio",
+    title: "UX Designer",
     summary:
-      "Passionate full-stack developer with expertise in React, Node.js, and scalable web applications.",
-    experience: [
-      {
-        id: "1",
-        title: "Product Engineer",
-        company: "XYZ Company",
-        duration: "2022 - Present",
-        responsibilities: [
-          "Developed scalable web applications using React and Node.js.",
-          "Led a team of developers to improve product efficiency.",
-          "Implemented CI/CD pipelines for automated deployment.",
-        ],
-      },
-      {
-        id: "2",
-        title: "Frontend Developer",
-        company: "ABC Tech",
-        duration: "2019 - 2022",
-        responsibilities: [
-          "Designed interactive UI components using React.js.",
-          "Optimized website performance for better user experience.",
-          "Collaborated with backend developers to integrate APIs.",
-        ],
-      },
+      "Results-driven UX Designer with expertise in user research, wireframing, and prototyping. Adept at improving user engagement and satisfaction through intuitive designs.",
+    projects: [
+      "System UX Engineer, XarrowAI Industries (02/2021 - 12/2022) - Led UX research, improved customer engagement by 30%, designed wireframes.",
+      "Instant Chartz App, Morcelle Program (01/2023 - Present) - Developed user flows, enhanced UI design consistency, increased retention rate.",
     ],
-    skills: ["React.js", "Node.js", "Redux", "Tailwind CSS", "MongoDB", "Git"],
-    education: "B.Sc. in Computer Science, XYZ University, 2018",
+    education: [
+      "Bachelor of Design in Process Engineering, Engineering University (05/2014 - 05/2016)",
+      "UX Industrial Basics and General Application, University of Engineering UX Cohort (08/2016 - 10/2019)",
+    ],
+    skills: [
+      "Prototyping Tools (Figma, Adobe XD)",
+      "User Research & Testing",
+      "Information Architecture",
+      "Interaction Design",
+      "Agile & Scrum Methodologies",
+    ],
+    languages: ["English (Fluent)", "French (Intermediate)", "Mandarin (Basic)"],
+    certifications: ["Professional Design Engineer (PDE) License"],
+    achievements: ["Most Innovative Employer of the Year (2021)"],
+  });
+
+  const handleChange = (e, field) => {
+    setResume({ ...resume, [field]: e.target.value });
   };
 
-  const [formData, setFormData] = useState(defaultFormData);
-
-  const handleInputChange = (e, field) => {
-    setFormData({ ...formData, [field]: e.target.value });
+  const handleArrayChange = (e, field, index) => {
+    const newValues = [...resume[field]];
+    newValues[index] = e.target.value;
+    setResume({ ...resume, [field]: newValues });
   };
 
-  const handleExperienceChange = (index, key, value) => {
-    const updatedExperience = [...formData.experience];
-    updatedExperience[index][key] = value;
-    setFormData({ ...formData, experience: updatedExperience });
+  const handleAdd = (field) => {
+    setResume({ ...resume, [field]: [...resume[field], ""] });
   };
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16).text(formData.name, 20, 20);
-    doc.setFontSize(14).text(formData.jobTitle, 20, 30);
-    doc.setFontSize(12).text("Summary:", 20, 45);
-    doc.text(formData.summary, 20, 55, { maxWidth: 170 });
-    doc.setFontSize(12).text("Experience:", 20, 80);
-    let y = 90;
-    formData.experience.forEach((exp) => {
-      doc.text(`${exp.title} - ${exp.company} (${exp.duration})`, 20, y);
-      y += 10;
-    });
-    doc.save("Resume.pdf");
-  };
-
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(formData.experience);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setFormData({ ...formData, experience: items });
+  const handleRemove = (field, index) => {
+    const newValues = resume[field].filter((_, i) => i !== index);
+    setResume({ ...resume, [field]: newValues });
   };
 
   return (
-    <div className="flex gap-6 p-6 max-w-6xl mx-auto">
-      <div className="w-1/2 p-6 border rounded-lg bg-white text-black shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-4">Resume Editor</h2>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => handleInputChange(e, "name")}
-          className="border p-2 w-full text-xl font-semibold"
-        />
-        <input
-          type="text"
-          value={formData.jobTitle}
-          onChange={(e) => handleInputChange(e, "jobTitle")}
-          className="border p-2 w-full text-lg text-gray-700 mt-2"
-        />
-        <textarea
-          value={formData.summary}
-          onChange={(e) => handleInputChange(e, "summary")}
-          className="border p-2 w-full mt-4"
-        />
-
-        <h3 className="text-lg font-semibold mt-4">Experience</h3>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="experience">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {formData.experience.map((exp, index) => (
-                  <Draggable key={exp.id} draggableId={exp.id} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="border p-4 my-2 bg-gray-100 rounded-lg shadow-sm"
+    <div className="flex p-10 bg-gray-900 min-h-screen">
+      <div className="w-full flex flex-row gap-8">
+        {/* Resume Editor Section */}
+        <div className="bg-white p-6 text-black rounded-lg shadow-lg border border-gray-300 w-1/2">
+          <h2 className="text-2xl font-bold text-gray-800">Edit Resume</h2>
+          <div className="mt-4 space-y-4">
+            {Object.entries(resume).map(([field, value]) =>
+              Array.isArray(value) ? (
+                <div key={field} className="mt-4">
+                  <h3 className="text-lg font-semibold text-gray-700 capitalize">{field.replace(/_/g, " ")}</h3>
+                  {value.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 mt-2">
+                      <input
+                        className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 text-black"
+                        value={item}
+                        onChange={(e) => handleArrayChange(e, field, index)}
+                      />
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                        onClick={() => handleRemove(field, index)}
                       >
-                        <input
-                          type="text"
-                          value={exp.title}
-                          onChange={(e) => handleExperienceChange(index, "title", e.target.value)}
-                          className="border p-2 w-full"
-                        />
-                        <input
-                          type="text"
-                          value={exp.company}
-                          onChange={(e) => handleExperienceChange(index, "company", e.target.value)}
-                          className="border p-2 w-full mt-2"
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    className="bg-green-500 text-black px-3 py-1 mt-2 rounded-md hover:bg-green-600 transition"
+                    onClick={() => handleAdd(field)}
+                  >
+                    + Add {field.slice(0, -1)}
+                  </button>
+                </div>
+              ) : (
+                <label key={field} className="block text-gray-700">
+                  <span className="font-semibold capitalize">{field.replace(/_/g, " ")}:</span>
+                  <input
+                    className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 mt-1 text-black"
+                    value={value}
+                    onChange={(e) => handleChange(e, field)}
+                  />
+                </label>
+              )
             )}
-          </Droppable>
-        </DragDropContext>
+          </div>
+        </div>
 
-        <h3 className="text-lg font-semibold mt-4">Skills</h3>
-        <textarea
-          value={formData.skills.join(", ")}
-          onChange={(e) => setFormData({ ...formData, skills: e.target.value.split(", ") })}
-          className="border p-2 w-full bg-gray-100 rounded-lg"
-        />
-
-        <h3 className="text-lg font-semibold mt-4">Education</h3>
-        <textarea
-          value={formData.education}
-          onChange={(e) => handleInputChange(e, "education")}
-          className="border p-2 w-full bg-gray-100 rounded-lg"
-        />
-      </div>
-
-      <div className="w-1/2 p-6 border rounded-lg bg-white text-black shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-4">Resume Preview</h2>
-        <p className="text-xl font-semibold">{formData.name}</p>
-        <p className="text-lg text-gray-700">{formData.jobTitle}</p>
-        <p className="mt-4">{formData.summary}</p>
-        <h3 className="text-lg font-semibold mt-4">Experience</h3>
-        {formData.experience.map((exp, index) => (
-          <p key={index} className="mt-2">
-            {exp.title} - {exp.company} ({exp.duration})
+        {/* Resume Preview Section - A4 Paper Size */}
+        <div
+          className="bg-white p-8 shadow-lg border border-gray-300 rounded-lg w-1/2"
+          style={{
+            width: "210mm",
+            height: "297mm",
+            overflow: "auto",
+            marginTop: "10px",
+            marginBottom: "10px",
+            boxSizing: "border-box",
+          }}
+        >
+          <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
+          <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
+          <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
+          <p className="text-gray-700 text-sm font-medium">
+            <a
+              href={`https://${resume.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              {resume.websiteText}
+            </a>
           </p>
-        ))}
-        <button onClick={handleDownloadPDF} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md">
-          Download PDF
-        </button>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Summary</h2>
+            <p className="text-gray-700 text-sm mt-2">{resume.summary}</p>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Projects</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.projects.map((item, index) => (
+                <li key={index} className="mb-2">
+                  <div className="font-semibold">{item.split(" (")[0]}</div>
+                  <div className="text-sm">{item.split(" (")[1]}</div>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Education</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.education.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Skills</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.skills.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Languages</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.languages.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Certifications</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.certifications.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Achievements</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.achievements.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </div>
     </div>
   );
