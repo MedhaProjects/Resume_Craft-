@@ -6,18 +6,18 @@ import { auth } from "../firebase"; // Firebase import for authentication
 import { onAuthStateChanged } from "firebase/auth";
 
 const templates = [
-  { id: 1, name: "Basic", image: "/t5.png", path: "/template5", isPremium: false, category: "experience" },
-  { id: 2, name: "Creative", image: "/t10.png", path: "/template10", isPremium: false, category: "experience" },
-  { id: 3, name: "Professional", image: "/t7.png", path: "/template7", isPremium: false, category: "experience" },
-  { id: 4, name: "Fresher", image: "/t9.png", path: "/template9", isPremium: false, category: "experience" },
+  { id: 1, name: "Experience-Basic", image: "/t5.png", path: "/template5", isPremium: false, category: "experience" },
+  { id: 5, name: "Fresher-Basic", image: "/t1.png", path: "/template1", isPremium: false, category: "fresher" },
+  { id: 2, name: "Experience-Simple", image: "/t10.png", path: "/template10", isPremium: false, category: "experience" },
+  
+  { id: 6, name: "Fresher-Simple", image: "/t7.png", path: "/template2", isPremium: false, category: "fresher" },
+  { id: 7, name: "Fresher-Professional", image: "/t3.png", path: "/template3", isPremium: false, category: "fresher" },
+  { id: 3, name: "Experience-Professional", image: "/t7.png", path: "/template7", isPremium: false, category: "experience" },
+  { id: 4, name: "Experience-Creative", image: "/t9.png", path: "/template9", isPremium: false, category: "experience" },
 
 
-  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: false, category: "fresher" },
-  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: false, category: "fresher" },
-  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: false, category: "fresher" },
-  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: false, category: "fresher" },
-
-
+ 
+  { id: 8, name: "Fresher-Creative", image: "/t10.png", path: "/template4", isPremium: false, category: "fresher" },
   { id: 9, name: "Pro", image: "/r1.jpg", path: "/template6", isPremium: true, category: "premium" },
   { id: 10, name: "Exp", image: "/r1.jpg", path: "/template8", isPremium: true, category: "premium" },
   { id: 11, name: "Photo", image: "/r1.jpg", path: "/template6", isPremium: true, category: "premium" },
