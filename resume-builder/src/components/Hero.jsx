@@ -21,8 +21,8 @@ const Hero = () => {
   ];
 
   const faqData = [
-    { question: "What makes Resume Builder the best resume tool?", answer: "Using the Resume Builder app, you have a 30% higher chance of getting a job..." },
-    { question: "How do I use the Resume Builder app?", answer: "Simply sign up, choose a template, enter your details, and let AI-powered suggestions guide you." },
+    { question: "What makes Resume Craft the best resume tool?", answer: "Using the Resume Builder app, you have a 30% higher chance of getting a job..." },
+    { question: "How do I use the Resume Craft app?", answer: "Simply sign up, choose a template, enter your details, and let AI-powered suggestions guide you." },
     { question: "Should I make a different resume for every job application?", answer: "Yes, tailoring your resume to each job increases your chances of getting noticed." }
   ];
 
