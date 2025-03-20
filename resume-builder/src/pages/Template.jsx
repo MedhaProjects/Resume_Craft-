@@ -6,31 +6,47 @@ import { auth } from "../firebase"; // Firebase import for authentication
 import { onAuthStateChanged } from "firebase/auth";
 
 const templates = [
-  { id: 1, name: "Basic", image: "/r1.jpg", path: "/template5", isPremium: false },
-  { id: 2, name: "Creative", image: "/r2.jpg", path: "/template10", isPremium: false },
-  { id: 3, name: "Professional", image: "/r1.jpg", path: "/template7", isPremium: false },
-  { id: 4, name: "Fresher", image: "/r1.jpg", path: "/template9", isPremium: false },
-  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: true },
-  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: true },
-  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: true },
-  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: true },
+  { id: 1, name: "Basic", image: "/r1.jpg", path: "/template5", isPremium: false, category: "fresher" },
+  { id: 2, name: "Creative", image: "/r2.jpg", path: "/template10", isPremium: false, category: "creative" },
+  { id: 3, name: "Professional", image: "/r1.jpg", path: "/template7", isPremium: false, category: "experience" },
+  { id: 4, name: "Fresher", image: "/r1.jpg", path: "/template9", isPremium: false, category: "fresher" },
+  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: true, category: "premium" },
+  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: true, category: "experience" },
+  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: true, category: "premium" },
+  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: true, category: "premium" },
 ];
+
 const filters = ["all", "free", "premium", "fresher", "experience", "creative"];
 
 const TemplatePage = () => {
   const navigate = useNavigate();
   const [hoveredTemplate, setHoveredTemplate] = useState(null);
-  const [isPremiumUser, setIsPremiumUser] = useState(false); // Change this based on user status
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState(null);
-  const [user, setUser] = useState(null); // Track if the user is logged in
+  const [user, setUser] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [filteredTemplates, setFilteredTemplates] = useState(templates);
 
   // Listen for authentication status changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); // Set user if logged in
+      setUser(currentUser);
     });
-    return () => unsubscribe(); // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
+
+  // Filter logic based on selected category
+  useEffect(() => {
+    if (selectedFilter === "all") {
+      setFilteredTemplates(templates);
+    } else if (selectedFilter === "free") {
+      setFilteredTemplates(templates.filter((t) => !t.isPremium));
+    } else if (selectedFilter === "premium") {
+      setFilteredTemplates(templates.filter((t) => t.isPremium));
+    } else {
+      setFilteredTemplates(templates.filter((t) => t.category === selectedFilter));
+    }
+  }, [selectedFilter]);
 
   return (
     <div className="min-h-screen bg-gray-900 py-10 text-center text-white px-5">
@@ -48,8 +64,26 @@ const TemplatePage = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mt-12 max-w-6xl mx-auto">
-        {templates.map((template) => (
+      {/* Filter Options */}
+      <div className="flex justify-center space-x-4 mt-8 mb-8">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setSelectedFilter(filter)}
+            className={`px-4 py-2 rounded-lg font-bold ${
+              selectedFilter === filter
+                ? "bg-teal-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-teal-600"
+            } transition`}
+          >
+            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Templates Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mt-6 max-w-6xl mx-auto">
+        {filteredTemplates.map((template) => (
           <motion.div
             key={template.id}
             className="relative bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-6 shadow-lg text-white hover:shadow-2xl transition-transform transform hover:scale-105 overflow-hidden"
@@ -72,7 +106,6 @@ const TemplatePage = () => {
             {hoveredTemplate === template.id && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 text-white text-lg font-semibold rounded-lg space-y-4 p-4">
                 {!user ? (
-                  // If the user is not logged in, show a "Login to Use" message
                   <>
                     <p className="text-xl">Login to Use Template</p>
                     <button
@@ -144,7 +177,6 @@ const TemplatePage = () => {
                 alt={previewTemplate.name}
                 className="w-auto h-full object-contain"
               />
-              {/* Action Buttons */}
               <div className="absolute bottom-10 flex justify-center space-x-4">
                 {previewTemplate.isPremium && !isPremiumUser ? (
                   <button
