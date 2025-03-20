@@ -1,286 +1,314 @@
 import React, { useState } from "react";
-import { jsPDF } from "jspdf";
 
-const Template2 = () => {
-  const [formData, setFormData] = useState({
-    name: "Jane Smith",
-    title: "Marketing Manager",
-    email: "jane.smith@example.com",
-    phone: "(123) 456-7890",
-    linkedin: "",
-    portfolio: "",
+const ResumeTemplate = () => {
+  const [data, setData] = useState({
+    name: "",
+    title: "",
+    contact: "",
+    email: "",
     summary: "",
-    experienceHeading: "Experience",
-    educationHeading: "Education",
-    skillsHeading: "Skills",
-    certificationsHeading: "Certifications",
-    projectsHeading: "Projects",
-    achievementsHeading: "Achievements",
-    experience: [""],
-    education: [""],
     skills: [""],
-    certifications: [""],
-    projects: [""],
-    achievements: [""]
+    projects: [{ projectName: "", duration: "", description: "" }],
+    education: [{ degree: "", institution: "", year: "" }],
+    certificates: [""],
+    achievements: [""],
+    languages: [""],
   });
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+  // Handle simple input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
   };
 
-  const handleArrayChange = (field, index, value) => {
-    const updatedArray = [...formData[field]];
+  // Handle changes for array inputs
+  const handleArrayChange = (index, e, field) => {
+    const { value } = e.target;
+    const updatedArray = [...data[field]];
     updatedArray[index] = value;
-    setFormData({ ...formData, [field]: updatedArray });
+    setData({ ...data, [field]: updatedArray });
   };
 
-  const addArrayItem = (field) => {
-    setFormData({
-      ...formData,
-      [field]: [...formData[field], ""]
-    });
+  // Handle changes for array of objects inputs
+  const handleArrayObjectChange = (index, e, field, subfield) => {
+    const { value } = e.target;
+    const updatedArray = [...data[field]];
+    updatedArray[index] = { ...updatedArray[index], [subfield]: value };
+    setData({ ...data, [field]: updatedArray });
   };
 
-  const removeArrayItem = (field, index) => {
-    const updatedArray = formData[field].filter((_, i) => i !== index);
-    setFormData({ ...formData, [field]: updatedArray });
+  // Add new empty array field
+  const addArrayField = (field) => {
+    const newField =
+      field === "projects"
+        ? { projectName: "", duration: "", description: "" }
+        : field === "education"
+        ? { degree: "", institution: "", year: "" }
+        : field === "skills" || field === "achievements" || field === "languages"
+        ? ""
+        : "";
+    setData({ ...data, [field]: [...data[field], newField] });
   };
 
-  const downloadResume = () => {
-    const doc = new jsPDF();
-    const margin = 10;
-    const lineHeight = 10;
-    const startY = 10;
-
-    doc.setFont("helvetica", "normal");
-
-    let currentY = startY;
-
-    // Name and Title
-    doc.setFontSize(22);
-    doc.text(formData.name, margin, currentY);
-    currentY += lineHeight * 2;
-    doc.setFontSize(16);
-    doc.text(formData.title, margin, currentY);
-    currentY += lineHeight * 2;
-
-    // Contact Info
-    doc.setFontSize(12);
-    doc.text(`Email: ${formData.email}`, margin, currentY);
-    currentY += lineHeight;
-    doc.text(`Phone: ${formData.phone}`, margin, currentY);
-    if (formData.linkedin) {
-      currentY += lineHeight;
-      doc.text(`LinkedIn: ${formData.linkedin}`, margin, currentY);
-    }
-    if (formData.portfolio) {
-      currentY += lineHeight;
-      doc.text(`Portfolio: ${formData.portfolio}`, margin, currentY);
-    }
-    currentY += lineHeight;
-
-    // Summary
-    if (formData.summary) {
-      doc.setFontSize(14);
-      doc.text("Summary", margin, currentY);
-      currentY += lineHeight;
-      doc.setFontSize(12);
-      doc.text(formData.summary, margin, currentY);
-      currentY += lineHeight * 2;
-    }
-
-    // Experience Section
-    doc.setFontSize(14);
-    doc.text(formData.experienceHeading, margin, currentY);
-    currentY += lineHeight;
-    doc.setFontSize(12);
-    formData.experience.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Education Section
-    doc.setFontSize(14);
-    doc.text(formData.educationHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.education.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Skills Section
-    doc.setFontSize(14);
-    doc.text(formData.skillsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.skills.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Certifications Section
-    doc.setFontSize(14);
-    doc.text(formData.certificationsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.certifications.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Projects Section
-    doc.setFontSize(14);
-    doc.text(formData.projectsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.projects.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    // Achievements Section
-    doc.setFontSize(14);
-    doc.text(formData.achievementsHeading, margin, currentY);
-    currentY += lineHeight;
-    formData.achievements.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item}`, margin, currentY);
-      currentY += lineHeight;
-    });
-
-    doc.save("resume.pdf");
+  // Remove a field from an array
+  const removeArrayField = (field, index) => {
+    const updatedArray = [...data[field]];
+    updatedArray.splice(index, 1);
+    setData({ ...data, [field]: updatedArray });
   };
 
   return (
-    <div className="flex gap-6 p-6 max-w-5xl mx-auto text-black">
-      <div className="w-1/2 bg-gray-100 p-4 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Edit Details</h2>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Full Name"
-        />
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Job Title"
-        />
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Email"
-        />
-        <input
-          type="text"
-          value={formData.phone}
-          onChange={(e) => handleChange("phone", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Phone"
-        />
-        <input
-          type="url"
-          value={formData.linkedin}
-          onChange={(e) => handleChange("linkedin", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="LinkedIn URL"
-        />
-        <input
-          type="url"
-          value={formData.portfolio}
-          onChange={(e) => handleChange("portfolio", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Portfolio URL"
-        />
-        <textarea
-          value={formData.summary}
-          onChange={(e) => handleChange("summary", e.target.value)}
-          className="w-full p-2 border rounded mb-2 text-black"
-          placeholder="Summary"
-        ></textarea>
+    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen justify-center">
+      {/* Input Section */}
+      <div className="w-1/2 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
+        <h2 className="text-xl font-bold mb-4 text-center">Enter Resume Details</h2>
 
-        {["experience", "education", "skills", "certifications", "projects", "achievements"].map((field) => (
-          <div key={field} className="mb-4">
-            <input
-              type="text"
-              value={formData[`${field}Heading`]}
-              onChange={(e) => handleChange(`${field}Heading`, e.target.value)}
-              className="w-full p-2 border rounded mb-2 text-black font-bold"
-              placeholder={`Heading for ${field}`}
-            />
-            {formData[field].map((item, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={item}
-                  onChange={(e) => handleArrayChange(field, index, e.target.value)}
-                  className="w-full p-2 border rounded text-black"
-                  placeholder={`Add ${field} details`}
-                />
-                <button
-                  onClick={() => removeArrayItem(field, index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Remove
-                </button>
-              </div>
+        {/* Basic Info */}
+        {["name", "title", "contact", "email"].map((field) => (
+          <input
+            key={field}
+            name={field}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={data[field]}
+            onChange={handleChange}
+            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        ))}
+
+        {/* Summary */}
+        <textarea
+          name="summary"
+          placeholder="Professional Summary"
+          value={data.summary}
+          onChange={handleChange}
+          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+
+        {/* Projects Section */}
+        <h3 className="font-semibold mt-4 text-lg">Projects</h3>
+        {data.projects.map((project, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["projectName", "duration", "description"].map((field) => (
+              <input
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={project[field]}
+                onChange={(e) =>
+                  handleArrayObjectChange(index, e, "projects", field)
+                }
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
             ))}
             <button
-              onClick={() => addArrayItem(field)}
-              className="bg-blue-500 text-white px-3 py-1 rounded"
+              onClick={() => removeArrayField("projects", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
             >
-              Add {field} item
+              ✕ Remove
             </button>
           </div>
         ))}
         <button
-          onClick={downloadResume}
-          className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+          onClick={() => addArrayField("projects")}
+          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
         >
-          Download Resume as PDF
+          + Add Project
+        </button>
+
+        {/* Education Section */}
+        <h3 className="font-semibold mt-4 text-lg">Education</h3>
+        {data.education.map((edu, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["degree", "institution", "year"].map((field) => (
+              <input
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={edu[field]}
+                onChange={(e) =>
+                  handleArrayObjectChange(index, e, "education", field)
+                }
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            ))}
+            <button
+              onClick={() => removeArrayField("education", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("education")}
+          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Education
+        </button>
+
+        {/* Skills Section */}
+        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
+        {data.skills.map((skill, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={skill}
+              onChange={(e) => handleArrayChange(index, e, "skills")}
+              placeholder="Skill"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => removeArrayField("skills", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("skills")}
+          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Skill
+        </button>
+
+        {/* Achievements Section */}
+        <h3 className="font-semibold mt-4 text-lg">Achievements</h3>
+        {data.achievements.map((achievement, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={achievement}
+              onChange={(e) => handleArrayChange(index, e, "achievements")}
+              placeholder="Achievement"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            <button
+              onClick={() => removeArrayField("achievements", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("achievements")}
+          className="bg-orange-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Achievement
+        </button>
+
+        {/* Languages Section */}
+        <h3 className="font-semibold mt-4 text-lg">Languages</h3>
+        {data.languages.map((language, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={language}
+              onChange={(e) => handleArrayChange(index, e, "languages")}
+              placeholder="Language"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+            <button
+              onClick={() => removeArrayField("languages", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("languages")}
+          className="bg-teal-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Language
         </button>
       </div>
 
-      <div className="w-1/2 p-6 border rounded-lg bg-white shadow-md text-black">
-        <header className="text-center mb-4">
-          <h1 className="text-4xl font-bold">{formData.name}</h1>
-          <p className="text-lg">{formData.title}</p>
-          <p className="text-md">Email: {formData.email} | Phone: {formData.phone}</p>
-          {formData.linkedin && (
-            <p className="text-md">
-              <a href={formData.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                LinkedIn
-              </a>
-            </p>
-          )}
-          {formData.portfolio && (
-            <p className="text-md">
-              <a href={formData.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                Portfolio
-              </a>
-            </p>
-          )}
-        </header>
-        {formData.summary && (
-          <section className="mt-4">
-            <h2 className="text-2xl font-semibold">Summary</h2>
-            <p>{formData.summary}</p>
-          </section>
-        )}
-        {["experience", "education", "skills", "certifications", "projects", "achievements"].map((field) => (
-          <section key={field} className="mt-4">
-            <h2 className="text-2xl font-semibold">{formData[`${field}Heading`]}</h2>
-            <ul className="list-disc pl-6 mt-2">
-              {formData[field].map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+      {/* Resume Preview Section */}
+      <div
+        className="w-1/2 bg-white text-black p-8 shadow-2xl rounded-3xl border border-gray-300"
+        style={{ maxWidth: "210mm", maxHeight: "297mm", margin: "0 auto", paddingBottom: "20px" }}
+      >
+        {/* Header */}
+        <div className="pb-4 mb-4 text-center border-b border-gray-200">
+          <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">
+            {data.name || "Rachelle Beaudry"}
+          </h1>
+          <p className="text-lg text-gray-600 mt-1">{data.title || "Accounting Executive"}</p>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+            {data.contact || "123 Anywhere St, Any City"} <br />
+            <span className="text-blue-700">{data.email || "hello@realityestate.com"}</span>
+          </p>
+        </div>
+
+        {/* Summary */}
+        <div className="mb-6 bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
+          <h3 className="font-semibold text-lg text-blue-800 mb-3">Professional Summary</h3>
+          <p className="text-gray-700 leading-relaxed">
+            {data.summary ||
+              "Results-driven Accounting Executive with a proven record of optimizing financial performance. Expertise in strategic financial initiatives and team leadership. Seeking a challenging executive role to leverage analytical skills and drive organizational success."}
+          </p>
+        </div>
+
+        {/* Projects */}
+        <div className="mb-6">
+          <h3 className="font-semibold text-lg text-blue-800 mb-4">Projects</h3>
+          {data.projects.map((project, index) => (
+            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+              <p className="font-bold text-lg text-gray-800">{project.projectName}</p>
+              <p className="text-sm text-gray-500">{project.duration}</p>
+              <p className="text-gray-700 text-sm">{project.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Skills */}
+        <div className="mb-6">
+          <h3 className="font-semibold text-lg text-blue-800 mb-4">Core Skills</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {data.skills.map((skill, index) => (
+              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+                {skill || "Skill"}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {/* Education */}
+        <div className="mb-6">
+          <h3 className="font-semibold text-lg text-blue-800 mb-4">Education</h3>
+          {data.education.map((edu, index) => (
+            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+              <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
+              <p className="text-sm text-gray-500">{edu.institution}</p>
+              <p className="text-gray-700 text-sm">{edu.year}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Achievements & Languages */}
+        <div className="mb-6">
+          <h3 className="font-semibold text-lg text-blue-800 mb-4">Achievements & Languages</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {data.achievements.map((ach, index) => (
+              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+                {ach || "Achievement"}
+              </p>
+            ))}
+            {data.languages.map((lang, index) => (
+              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+                {lang || "Language"}
+              </p>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Template2;
+export default ResumeTemplate;
