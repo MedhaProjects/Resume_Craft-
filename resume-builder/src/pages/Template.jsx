@@ -6,14 +6,25 @@ import { auth } from "../firebase"; // Firebase import for authentication
 import { onAuthStateChanged } from "firebase/auth";
 
 const templates = [
-  { id: 1, name: "Basic", image: "/r1.jpg", path: "/template5", isPremium: false, category: "fresher" },
-  { id: 2, name: "Creative", image: "/r2.jpg", path: "/template10", isPremium: false, category: "creative" },
-  { id: 3, name: "Professional", image: "/r1.jpg", path: "/template7", isPremium: false, category: "experience" },
-  { id: 4, name: "Fresher", image: "/r1.jpg", path: "/template9", isPremium: false, category: "fresher" },
-  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: true, category: "premium" },
-  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: true, category: "experience" },
-  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: true, category: "premium" },
-  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: true, category: "premium" },
+  { id: 1, name: "Basic", image: "/t5.png", path: "/template5", isPremium: false, category: "experience" },
+  { id: 2, name: "Creative", image: "/t10.png", path: "/template10", isPremium: false, category: "experience" },
+  { id: 3, name: "Professional", image: "/t7.png", path: "/template7", isPremium: false, category: "experience" },
+  { id: 4, name: "Fresher", image: "/t9.png", path: "/template9", isPremium: false, category: "experience" },
+
+
+  { id: 5, name: "Pro", image: "/r1.jpg", path: "/template1", isPremium: false, category: "fresher" },
+  { id: 6, name: "Exp", image: "/r1.jpg", path: "/template2", isPremium: false, category: "fresher" },
+  { id: 7, name: "Photo", image: "/r1.jpg", path: "/template3", isPremium: false, category: "fresher" },
+  { id: 8, name: "Final", image: "/r1.jpg", path: "/template4", isPremium: false, category: "fresher" },
+
+
+  { id: 9, name: "Pro", image: "/r1.jpg", path: "/template6", isPremium: true, category: "premium" },
+  { id: 10, name: "Exp", image: "/r1.jpg", path: "/template8", isPremium: true, category: "premium" },
+  { id: 11, name: "Photo", image: "/r1.jpg", path: "/template6", isPremium: true, category: "premium" },
+  { id: 12, name: "Final", image: "/r1.jpg", path: "/template8", isPremium: true, category: "premium" },
+
+  { id: 13, name: "Photo", image: "/r1.jpg", path: "/template6", isPremium: true, category: "creative" },
+  { id: 14, name: "Final", image: "/r1.jpg", path: "/template8", isPremium: true, category: "creative" },
 ];
 
 const filters = ["all", "free", "premium", "fresher", "experience", "creative"];
@@ -97,7 +108,7 @@ const TemplatePage = () => {
             <img
               src={template.image}
               alt={template.name}
-              className="w-full h-48 object-cover rounded-lg"
+              className="w-full h-48 object-contain rounded-lg"  // Use object-contain for proper visibility
             />
             <h3 className="text-xl font-semibold mt-3 text-center text-teal-300">
               {template.name}
