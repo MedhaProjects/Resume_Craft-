@@ -45,15 +45,15 @@ const ResumeEditor = () => {
   return (
     <div className="flex gap-8 max-w-6xl mx-auto p-8 text-left">
       <div className="w-1/2 bg-gray-100 p-4 rounded-md">
-        <h2 className="text-lg font-bold text-black">Edit Resume</h2>
+        <h2 className="text-lg font-bold bg-white text-black">Edit Resume</h2>
         {Object.entries(resume).map(([field, value]) => (
           Array.isArray(value) ? (
             <div key={field} className="mt-4">
-              <h3 className="text-md font-bold text-black capitalize">{field}</h3>
+              <h3 className="text-md font-bold  bg-white text-black capitalize">{field}</h3>
               {value.map((item, index) => (
                 <div key={index} className="flex items-center gap-2 mt-2">
                   <input
-                    className="w-full border p-2 bg-black text-white"
+                    className="w-full border p-2 bg-white text-black"
                     value={item}
                     onChange={(e) => handleArrayChange(e, field, index)}
                   />
@@ -84,7 +84,7 @@ const ResumeEditor = () => {
           )
         ))}
       </div>
-      <div className="w-1/2 bg-white shadow-lg p-4 border border-gray-300 rounded-md">
+      <div className="w-1/2 bg-white text-black shadow-lg p-4 border border-gray-300 rounded-md">
         <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
         <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
         <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
