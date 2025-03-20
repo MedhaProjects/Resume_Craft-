@@ -61,7 +61,7 @@ const ResumeTemplate = () => {
   return (
     <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen justify-center">
       {/* Input Section */}
-      <div className="w-full max-w-2xl bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
+      <div className="w-1/2 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
         <h2 className="text-xl font-bold mb-4 text-center">Enter Resume Details</h2>
 
         {/* Basic Info */}
@@ -228,9 +228,10 @@ const ResumeTemplate = () => {
           + Add Language
         </button>
       </div>
+
       {/* Resume Preview Section */}
       <div
-        className="w-full max-w-2xl bg-white text-black p-8 shadow-2xl rounded-3xl border border-gray-300"
+        className="w-1/2 bg-white text-black p-8 shadow-2xl rounded-3xl border border-gray-300"
         style={{ maxWidth: "210mm", maxHeight: "297mm", margin: "0 auto", paddingBottom: "20px" }}
       >
         {/* Header */}
@@ -297,19 +298,17 @@ const ResumeTemplate = () => {
         {/* Achievements & Languages */}
         <div className="mb-6">
           <h3 className="font-semibold text-lg text-blue-800 mb-4">Achievements & Languages</h3>
-          <div className="space-y-3">
-            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-              {data.achievements.map((ach, index) => (
-                <li key={index} className="text-sm">{ach}</li>
-              ))}
-            </ul>
-            <ul className="flex flex-wrap gap-2 text-gray-700">
-              {data.languages.map((lang, index) => (
-                <li key={index} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-gray-200">
-                  {lang || "Language"}
-                </li>
-              ))}
-            </ul>
+          <div className="grid grid-cols-2 gap-2">
+            {data.achievements.map((ach, index) => (
+              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+                {ach || "Achievement"}
+              </p>
+            ))}
+            {data.languages.map((lang, index) => (
+              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+                {lang || "Language"}
+              </p>
+            ))}
           </div>
         </div>
       </div>
