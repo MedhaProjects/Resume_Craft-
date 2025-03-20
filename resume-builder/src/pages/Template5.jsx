@@ -8,19 +8,25 @@ const ResumeEditor = () => {
     websiteText: "My Portfolio",
     title: "UX Designer",
     summary:
-      "UX Designer with a focus on delivering impactful results, eager to tackle dynamic challenges and apply creativity to craft intuitive user experiences. Demonstrated proficiency in project management, user-centric problem-solving, and seamless collaboration across teams. Skilled in leveraging state-of-the-art tools and methodologies to streamline processes and elevate user satisfaction.",
+      "Results-driven UX Designer with expertise in user research, wireframing, and prototyping. Adept at improving user engagement and satisfaction through intuitive designs.",
     experience: [
-      "System UX Engineer, XarrowAI Industries (Feb 2021 - Dec 2022)",
-      "Instant Chartz App, Morcelle Program (Jan 2023 - Present)"
+      "System UX Engineer, XarrowAI Industries (02/2021 - 12/2022) - Led UX research, improved customer engagement by 30%, designed wireframes.",
+      "Instant Chartz App, Morcelle Program (01/2023 - Present) - Developed user flows, enhanced UI design consistency, increased retention rate.",
     ],
     education: [
-      "Bachelor of Design in Process Engineering, Engineering University (May 2014 - May 2016)",
-      "UX Industrial Basics and General Application, University of Engineering UX Cohort (Aug 2016 - Oct 2019)"
+      "Bachelor of Design in Process Engineering, Engineering University (05/2014 - 05/2016)",
+      "UX Industrial Basics and General Application, University of Engineering UX Cohort (08/2016 - 10/2019)",
     ],
-    skills: ["Prototyping Tools", "User Research", "Information Architecture", "Interaction Design", "Visual Design", "Usability Heuristics", "Accessibility", "Responsive Design", "User Testing Tools"],
-    languages: ["English", "French", "Mandarin"],
-    certifications: ["Professional Design Engineer (PDE) License", "Project Management Tech (PMT)"],
-    awards: ["Most Innovative Employer of the Year (2021)", "Overall Best Employee Division Two (2024)", "Onboarding Project Lead (2023)"]
+    skills: [
+      "Prototyping Tools (Figma, Adobe XD)",
+      "User Research & Testing",
+      "Information Architecture",
+      "Interaction Design",
+      "Agile & Scrum Methodologies",
+    ],
+    languages: ["English (Fluent)", "French (Intermediate)", "Mandarin (Basic)"],
+    certifications: ["Professional Design Engineer (PDE) License"],
+    awards: ["Most Innovative Employer of the Year (2021)"],
   });
 
   const handleChange = (e, field) => {
@@ -43,70 +49,119 @@ const ResumeEditor = () => {
   };
 
   return (
-    <div className="flex gap-8 max-w-6xl mx-auto p-8 text-left">
-      <div className="w-1/2 bg-gray-100 p-4 rounded-md">
-        <h2 className="text-lg font-bold bg-white text-black">Edit Resume</h2>
-        {Object.entries(resume).map(([field, value]) => (
-          Array.isArray(value) ? (
-            <div key={field} className="mt-4">
-              <h3 className="text-md font-bold  bg-white text-black capitalize">{field}</h3>
-              {value.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 mt-2">
-                  <input
-                    className="w-full border p-2 bg-white text-black"
-                    value={item}
-                    onChange={(e) => handleArrayChange(e, field, index)}
-                  />
+    <div className="flex flex-col items-center p-10 bg-gray-900 min-h-screen">
+      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Resume Editor Section */}
+        <div className="bg-white p-6 text-black rounded-lg shadow-lg border border-gray-300">
+          <h2 className="text-2xl font-bold text-gray-800">Edit Resume</h2>
+          <div className="mt-4 space-y-4">
+            {Object.entries(resume).map(([field, value]) =>
+              Array.isArray(value) ? (
+                <div key={field} className="mt-4">
+                  <h3 className="text-lg font-semibold text-gray-700 capitalize">{field.replace(/_/g, " ")}</h3>
+                  {value.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 mt-2">
+                      <input
+                        className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 text-black"
+                        value={item}
+                        onChange={(e) => handleArrayChange(e, field, index)}
+                      />
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                        onClick={() => handleRemove(field, index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                   <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleRemove(field, index)}
+                    className="bg-green-500 text-black px-3 py-1 mt-2 rounded-md hover:bg-green-600 transition"
+                    onClick={() => handleAdd(field)}
                   >
-                    Remove
+                    + Add {field.slice(0, -1)}
                   </button>
                 </div>
-              ))}
-              <button
-                className="bg-green-500 text-white px-2 py-1 mt-2 rounded"
-                onClick={() => handleAdd(field)}
+              ) : (
+                <label key={field} className="block text-gray-700">
+                  <span className="font-semibold capitalize">{field.replace(/_/g, " ")}:</span>
+                  <input
+                    className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 mt-1 text-black"
+                    value={value}
+                    onChange={(e) => handleChange(e, field)}
+                  />
+                </label>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* Resume Preview Section */}
+        <div className="flex items-center justify-center">
+          <div
+            className="bg-white p-8 shadow-lg border border-gray-300 rounded-lg"
+            style={{
+              width: "210mm",
+              minHeight: "297mm",
+              padding: "20mm",
+              boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
+            <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
+            <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
+            <p className="text-gray-700 text-sm font-medium">
+              <a
+                href={`https://${resume.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
               >
-                Add {field.slice(0, -1)}
-              </button>
-            </div>
-          ) : (
-            <label key={field} className="block mt-4 capitalize text-black">
-              {field}:
-              <input
-                className="w-full border p-2 bg-black text-white"
-                value={value}
-                onChange={(e) => handleChange(e, field)}
-              />
-            </label>
-          )
-        ))}
-      </div>
-      <div className="w-1/2 bg-white text-black shadow-lg p-4 border border-gray-300 rounded-md">
-        <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
-        <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
-        <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
-        <p className="text-gray-700 text-sm font-medium">
-          <a href={`https://${resume.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-            {resume.websiteText}
-          </a>
-        </p>
-        {Object.entries(resume).slice(5).map(([field, value]) => (
-          <section key={field} className="mt-6">
-            <h2 className="text-md font-bold text-blue-700 uppercase border-b pb-1 capitalize">{field}</h2>
-            {Array.isArray(value) ? (
+                {resume.websiteText}
+              </a>
+            </p>
+
+            <section className="mt-6">
+              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Summary</h2>
+              <p className="text-gray-700 text-sm mt-2">{resume.summary}</p>
+            </section>
+
+            <section className="mt-6">
+              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Work Experience</h2>
               <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-                {value.map((item, index) => (
+                {resume.experience.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-gray-700 text-sm mt-2">{value}</p>
-            )}
-          </section>
-        ))}
+            </section>
+
+            <section className="mt-6">
+              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Education</h2>
+              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+                {resume.education.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="mt-6">
+              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Skills</h2>
+              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+                {resume.skills.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="mt-6">
+              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Certifications</h2>
+              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+                {resume.certifications.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   );
