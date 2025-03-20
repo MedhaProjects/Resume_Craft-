@@ -2,284 +2,313 @@ import React, { useState } from "react";
 
 const ResumeTemplate = () => {
   const [data, setData] = useState({
-    name: "",
-    title: "",
-    contact: "",
-    email: "",
-    summary: "",
-    skills: [""],
-    experience: [{ company: "", duration: "", details: "" }],
-    education: [{ degree: "", institution: "", year: "" }],
-    projects: "",
-    certificates: [""],
-    achievements: [""],
-    languages: [""],
+    name: "DANIEL GALLEGO",
+    title: "UX DESIGNER",
+    contact: "123 Anywhere St, Any City | hello@reallygreatsite.com | www.reallygreatsite.com",
+    summary:
+      "UX Designer with a focus on delivering impactful results, eager to tackle dynamic challenges and apply creativity to craft intuitive user experiences. Demonstrated proficiency in project management, user-centric problem-solving, and seamless collaboration across teams. Skilled in leveraging state-of-the-art tools and methodologies to streamline processes and elevate user satisfaction.",
+    skills: [
+      "Prototyping Tools", "Interaction Design", "Accessibility",
+      "User Research", "Visual Design", "Responsive Design",
+      "Information Architecture", "Usability Heuristics", "User Testing Tools"
+    ],
+    experience: [
+      {
+        company: "Instant Chartz App, Morcelle Program",
+        duration: "Jan 2023 - Present",
+        details: [
+          "Led development of an advanced automation system, achieving a 15% increase in operational efficiency.",
+          "Streamlined manufacturing processes, reducing production costs by 10%.",
+          "Implemented preventive maintenance strategies, resulting in a 20% decrease in equipment downtime."
+        ]
+      },
+      {
+        company: "System UX Engineer, XarrowAI Industries",
+        duration: "Feb 2021 - Dec 2022",
+        details: [
+          "Designed and optimized a robotic control system, realizing a 12% performance improvement.",
+          "Coordinated testing and validation, ensuring compliance with industry standards.",
+          "Provided technical expertise, contributing to a 15% reduction in system failures."
+        ]
+      }
+    ],
+    education: [
+      {
+        degree: "UX Industrial Basics and General Application",
+        institution: "University of Engineering UX Cohort",
+        year: "Aug 2016 - Oct 2019"
+      },
+      {
+        degree: "Bachelor of Design in Process Engineering",
+        institution: "Engineering University",
+        year: "May 2014 - May 2016"
+      }
+    ],
+    additional: {
+      languages: "English, French, Mandarin",
+      certifications: "Professional Design Engineer (PDE) License, Project Management Tech (PMT)",
+      awards: "Most Innovative Employer of the Year (2021), Overall Best Employee Division Two (2024), Onboarding Project Lead (2023)"
+    }
   });
 
-  // Handle simple input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+    setData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
   };
 
-  // Handle changes for array inputs
-  const handleArrayChange = (index, e, field, subfield) => {
-    const { value } = e.target;
+  const handleArrayChange = (e, field, index) => {
+    const { name, value } = e.target;
     const updatedArray = [...data[field]];
-    updatedArray[index] = subfield
-      ? { ...updatedArray[index], [subfield]: value }
-      : value;
-    setData({ ...data, [field]: updatedArray });
+    updatedArray[index] = { ...updatedArray[index], [name]: value };
+    setData(prevData => ({
+      ...prevData,
+      [field]: updatedArray
+    }));
   };
 
-  // Add new empty array field
-  const addArrayField = (field) => {
-    const newField =
-      field === "experience"
-        ? { company: "", duration: "", details: "" }
-        : field === "education"
-        ? { degree: "", institution: "", year: "" }
-        : "";
-    setData({ ...data, [field]: [...data[field], newField] });
+  const handleClearField = (field) => {
+    setData(prevData => ({
+      ...prevData,
+      [field]: field === 'skills' ? [] : ''
+    }));
   };
 
-  // Remove a field from an array
-  const removeArrayField = (field, index) => {
+  const handleClearArrayField = (field, index, key) => {
     const updatedArray = [...data[field]];
-    updatedArray.splice(index, 1);
-    setData({ ...data, [field]: updatedArray });
+    updatedArray[index] = { ...updatedArray[index], [key]: '' };
+    setData(prevData => ({
+      ...prevData,
+      [field]: updatedArray
+    }));
   };
 
   return (
-    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen">
-      {/* Input Section */}
-      <div className="w-1/3 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
-        <h2 className="text-xl font-bold mb-4 text-center">
-          Enter Resume Details
-        </h2>
+    <div className="flex space-x-4">
+      {/* Form Section */}
+      <div className="flex-1 text-black bg-white shadow-lg p-8 border rounded-lg font-sans">
+        <h2 className="text-2xl font-semibold">Edit Resume</h2>
 
-        {/* Basic Info */}
-        {["name", "title", "contact", "email"].map((field) => (
+        {/* Name */}
+        <div className="flex items-center mb-2">
           <input
-            key={field}
-            name={field}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={data[field]}
+            type="text"
+            name="name"
+            value={data.name}
             onChange={handleChange}
-            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Full Name"
+            className="border p-2 w-full"
           />
-        ))}
+          <button onClick={() => handleClearField('name')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+        </div>
 
-        {/* Summary */}
-        <textarea
-          name="summary"
-          placeholder="Summary"
-          value={data.summary}
-          onChange={handleChange}
-          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
+        {/* Title */}
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="title"
+            value={data.title}
+            onChange={handleChange}
+            placeholder="Job Title"
+            className="border p-2 w-full"
+          />
+          <button onClick={() => handleClearField('title')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+        </div>
 
-        {/* Experience Section */}
-        <h3 className="font-semibold mt-4 text-lg">Experience</h3>
-        {data.experience.map((exp, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["company", "duration", "details"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={exp[field]}
-                onChange={(e) => handleArrayChange(index, e, "experience", field)}
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("experience", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("experience")}
-          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Experience
-        </button>
-
-        {/* Education Section */}
-        <h3 className="font-semibold mt-4 text-lg">Education</h3>
-        {data.education.map((edu, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["degree", "institution", "year"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={edu[field]}
-                onChange={(e) => handleArrayChange(index, e, "education", field)}
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("education", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("education")}
-          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Education
-        </button>
-
-        {/* Skills Section */}
-        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
-        {data.skills.map((skill, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={skill}
-              onChange={(e) => handleArrayChange(index, e, "skills")}
-              placeholder="Skill"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={() => removeArrayField("skills", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("skills")}
-          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Skill
-        </button>
-      </div>
-
-      {/* Resume Preview Section */}
-      <div
-        className="w-2/3 bg-white text-black p-10 shadow-lg rounded-2xl border border-gray-300"
-        style={{
-          width: "210mm", // A4 width
-          height: "297mm", // A4 height
-          overflowY: "auto",
-        }}
-      >
-        {/* Header */}
-        <div className="border-b pb-6 mb-8 text-center">
-          <h1 className="text-4xl font-bold text-blue-700">{data.name || "John Doe"}</h1>
-          <h2 className="text-lg text-gray-600 mt-1">{data.title || "Software Engineer"}</h2>
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-            {data.contact || "123 Main St, City | johndoe@gmail.com"} <br />
-            {data.email || "johndoe@gmail.com"}
-          </p>
+        {/* Contact Info */}
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="contact"
+            value={data.contact}
+            onChange={handleChange}
+            placeholder="Contact Info"
+            className="border p-2 w-full"
+          />
+          <button onClick={() => handleClearField('contact')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
         </div>
 
         {/* Summary */}
-        <div className="mb-8 bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="font-semibold text-lg text-blue-700 mb-2">Summary</h3>
-          <p className="text-gray-700 leading-relaxed">{data.summary || "Summary will appear here..."}</p>
+        <div className="flex items-center mb-2">
+          <textarea
+            name="summary"
+            value={data.summary}
+            onChange={handleChange}
+            placeholder="Summary"
+            className="border p-2 w-full"
+          />
+          <button onClick={() => handleClearField('summary')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+        </div>
+
+        {/* Skills */}
+        <div className="flex items-center mb-2">
+          <textarea
+            name="skills"
+            value={data.skills.join(", ")}
+            onChange={(e) => handleChange({ target: { name: "skills", value: e.target.value.split(", ") } })}
+            placeholder="Skills (comma separated)"
+            className="border p-2 w-full"
+          />
+          <button onClick={() => handleClearField('skills')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
         </div>
 
         {/* Experience */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Experience</h3>
+        {data.experience.map((exp, index) => (
+          <div key={index} className="mb-4">
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                name="company"
+                value={exp.company}
+                onChange={(e) => handleArrayChange(e, "experience", index)}
+                placeholder="Company"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('experience', index, 'company')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                name="duration"
+                value={exp.duration}
+                onChange={(e) => handleArrayChange(e, "experience", index)}
+                placeholder="Duration"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('experience', index, 'duration')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+            <div className="flex items-center mb-2">
+              <textarea
+                name="details"
+                value={exp.details.join(", ")}
+                onChange={(e) => handleArrayChange(e, "experience", index)}
+                placeholder="Experience Details (comma separated)"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('experience', index, 'details')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+          </div>
+        ))}
+
+        {/* Education */}
+        {data.education.map((edu, index) => (
+          <div key={index} className="mb-4">
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                name="degree"
+                value={edu.degree}
+                onChange={(e) => handleArrayChange(e, "education", index)}
+                placeholder="Degree"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('education', index, 'degree')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                name="institution"
+                value={edu.institution}
+                onChange={(e) => handleArrayChange(e, "education", index)}
+                placeholder="Institution"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('education', index, 'institution')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="text"
+                name="year"
+                value={edu.year}
+                onChange={(e) => handleArrayChange(e, "education", index)}
+                placeholder="Year"
+                className="border p-2 w-full"
+              />
+              <button onClick={() => handleClearArrayField('education', index, 'year')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+            </div>
+          </div>
+        ))}
+
+        {/* Additional Info - Editable Fields */}
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="languages"
+            value={data.additional.languages}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, languages: e.target.value } } })}
+            placeholder="Languages"
+            className="border p-2 w-full"
+          />
+        </div>
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="certifications"
+            value={data.additional.certifications}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, certifications: e.target.value } } })}
+            placeholder="Certifications"
+            className="border p-2 w-full"
+          />
+        </div>
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="awards"
+            value={data.additional.awards}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, awards: e.target.value } } })}
+            placeholder="Awards"
+            className="border p-2 w-full"
+          />
+        </div>
+      </div>
+
+      {/* Preview Section */}
+      <div className="flex-1 bg-white text-black shadow-lg p-8 border rounded-lg font-sans" style={{ width: '8.27in', height: '11.69in', pageBreakAfter: 'always', border: '1px solid #000', padding: '2rem' }}>
+        <h1 className="text-3xl font-bold">{data.name}</h1>
+        <h2 className="text-lg font-semibold text-gray-600">{data.title}</h2>
+        <p className="text-gray-700 mt-2">{data.contact}</p>
+        <div className="mt-4 bg-gray-200 p-3 rounded-md">
+          <h3 className="font-semibold">SUMMARY</h3>
+          <p className="text-gray-700 text-sm">{data.summary}</p>
+        </div>
+        <div className="mt-4 bg-gray-200 p-3 rounded-md">
+          <h3 className="font-semibold">TECHNICAL SKILLS</h3>
+          <ul className="text-gray-700 text-sm grid grid-cols-3 gap-1">
+            {data.skills.map((skill, index) => (
+              <li key={index}>{skill}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-4">
+          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">PROFESSIONAL EXPERIENCE</h3>
           {data.experience.map((exp, index) => (
-            <div
-              key={index}
-              className="mb-4 p-5 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
-            >
-              <p className="font-semibold text-md text-gray-800">{exp.company}</p>
-              <p className="text-sm text-gray-500">{exp.duration}</p>
-              <ul className="list-disc ml-5 text-gray-700 mt-2">
-                {exp.details.split("\n").map((line, i) => (
-                  <li key={i} className="text-sm">{line}</li>
+            <div key={index} className="mt-2">
+              <h4 className="font-semibold">{exp.company}</h4>
+              <p className="text-gray-600 text-sm">{exp.duration}</p>
+              <ul className="list-disc list-inside text-gray-700 text-sm">
+                {exp.details.map((detail, i) => (
+                  <li key={i}>{detail}</li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-
-        {/* Education */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Education</h3>
+        <div className="mt-4">
+          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">EDUCATION</h3>
           {data.education.map((edu, index) => (
-            <div
-              key={index}
-              className="mb-4 p-5 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
-            >
-              <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
-              <p className="text-sm text-gray-500">{edu.institution}</p>
-              <p className="text-gray-700 text-sm">{edu.year}</p>
+            <div key={index} className="mt-2">
+              <h4 className="font-semibold">{edu.degree}</h4>
+              <p className="text-gray-600 text-sm">{edu.institution}, {edu.year}</p>
             </div>
           ))}
         </div>
-
-        {/* Skills */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Skills</h3>
-          <ul className="flex flex-wrap gap-2 text-gray-700">
-            {data.skills.map((skill, index) => (
-              <li
-                key={index}
-                className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-gray-300"
-              >
-                {skill || "Skill"}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Certificates */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Certificates</h3>
-          <ul className="list-disc pl-5 text-gray-700">
-            {data.certificates.map((cert, index) => (
-              <li key={index} className="mb-2 text-sm">
-                {cert}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Achievements */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Achievements</h3>
-          <ul className="list-disc pl-5 text-gray-700">
-            {data.achievements.map((ach, index) => (
-              <li key={index} className="mb-2 text-sm">
-                {ach}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Languages */}
-        <div>
-          <h3 className="font-semibold text-lg text-blue-700 mb-4">Languages</h3>
-          <ul className="flex flex-wrap gap-2 text-gray-700">
-            {data.languages.map((lang, index) => (
-              <li
-                key={index}
-                className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-gray-300"
-              >
-                {lang || "Language"}
-              </li>
-            ))}
-          </ul>
+        <div className="mt-4">
+          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">ADDITIONAL</h3>
+          <p className="text-gray-700 text-sm">Languages: {data.additional.languages}</p>
+          <p className="text-gray-700 text-sm">Certifications: {data.additional.certifications}</p>
+          <p className="text-gray-700 text-sm">Awards: {data.additional.awards}</p>
         </div>
       </div>
     </div>
