@@ -231,21 +231,41 @@ const ResumeTemplate = () => {
           </div>
         ))}
 
-        {/* Additional Info */}
+        {/* Additional Info - Editable Fields */}
         <div className="flex items-center mb-2">
-          <textarea
-            name="additional"
-            value={`Languages: ${data.additional.languages}, Certifications: ${data.additional.certifications}, Awards: ${data.additional.awards}`}
-            onChange={handleChange}
-            placeholder="Additional Info"
+          <input
+            type="text"
+            name="languages"
+            value={data.additional.languages}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, languages: e.target.value } } })}
+            placeholder="Languages"
             className="border p-2 w-full"
           />
-          <button onClick={() => handleClearField('additional')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
+        </div>
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="certifications"
+            value={data.additional.certifications}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, certifications: e.target.value } } })}
+            placeholder="Certifications"
+            className="border p-2 w-full"
+          />
+        </div>
+        <div className="flex items-center mb-2">
+          <input
+            type="text"
+            name="awards"
+            value={data.additional.awards}
+            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, awards: e.target.value } } })}
+            placeholder="Awards"
+            className="border p-2 w-full"
+          />
         </div>
       </div>
 
       {/* Preview Section */}
-      <div className="flex-1 bg-white text-black shadow-lg p-8 border rounded-lg font-sans">
+      <div className="flex-1 bg-white text-black shadow-lg p-8 border rounded-lg font-sans" style={{ width: '8.27in', height: '11.69in', pageBreakAfter: 'always', border: '1px solid #000', padding: '2rem' }}>
         <h1 className="text-3xl font-bold">{data.name}</h1>
         <h2 className="text-lg font-semibold text-gray-600">{data.title}</h2>
         <p className="text-gray-700 mt-2">{data.contact}</p>
@@ -286,9 +306,9 @@ const ResumeTemplate = () => {
         </div>
         <div className="mt-4">
           <h3 className="font-semibold bg-gray-200 p-3 rounded-md">ADDITIONAL</h3>
-          <p className="text-gray-700 text-sm">{data.additional.languages}</p>
-          <p className="text-gray-700 text-sm">{data.additional.certifications}</p>
-          <p className="text-gray-700 text-sm">{data.additional.awards}</p>
+          <p className="text-gray-700 text-sm">Languages: {data.additional.languages}</p>
+          <p className="text-gray-700 text-sm">Certifications: {data.additional.certifications}</p>
+          <p className="text-gray-700 text-sm">Awards: {data.additional.awards}</p>
         </div>
       </div>
     </div>
