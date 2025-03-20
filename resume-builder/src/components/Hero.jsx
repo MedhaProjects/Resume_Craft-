@@ -12,13 +12,14 @@ const Hero = () => {
   const handleGetStarted = () => navigate("/template");
 
   const features = [
-    { title: "Powerful Resume Builder", description: "Use expert guidance to create the perfect resume.", color: "from-green-400 to-blue-500" },
-    { title: "Professional Templates", description: "Choose from 25+ ATS-friendly modern and professional templates.", color: "from-purple-400 to-pink-500" },
-    { title: "Customize Fonts & Colors", description: "Personalize fonts, colors, and layouts to match your style.", color: "from-yellow-400 to-red-500" },
-    { title: "Free Resume Examples", description: "Browse 500+ examples and templates tailored for various industries.", color: "from-blue-400 to-green-500" },
-    { title: "ATS-Friendly Templates", description: "Sail through applicant tracking systems with ease.", color: "from-pink-400 to-purple-500" },
-    { title: "Expert Tips & Guidance", description: "Get help at every step with expert tips and suggested phrases.", color: "from-orange-400 to-yellow-500" }
+    { title: "ATS Score Calculator", description: "Analyze your resume and get an ATS compatibility score with detailed feedback.", color: "from-green-400 to-blue-500" },
+    { title: "Template Options", description: "Choose from multiple professional and modern templates for different job roles.", color: "from-purple-400 to-pink-500" },
+    { title: "Download Feature", description: "Easily download your resume in PDF or Word format with a single click.", color: "from-yellow-400 to-red-500" },
+    { title: "AI Chatbot Assistance", description: "Get instant guidance on resume building with an AI-powered chatbot.", color: "from-blue-400 to-green-500" },
+    { title: "Template Type Description", description: "Understand the strengths of different templates and pick the best one for your career needs.", color: "from-pink-400 to-purple-500" },
+    { title: "Upgrade Options", description: "Unlock premium features, advanced templates, and expert reviews for a professional edge.", color: "from-orange-400 to-yellow-500" }
   ];
+  
 
   const faqData = [
     { question: "What makes Resume Craft the best resume tool?", answer: "Using the Resume Builder app, you have a 30% higher chance of getting a job..." },
