@@ -26,7 +26,7 @@ const ResumeEditor = () => {
     ],
     languages: ["English (Fluent)", "French (Intermediate)", "Mandarin (Basic)"],
     certifications: ["Professional Design Engineer (PDE) License"],
-    awards: ["Most Innovative Employer of the Year (2021)"],
+    achievements: ["Most Innovative Employer of the Year (2021)"],
   });
 
   const handleChange = (e, field) => {
@@ -49,10 +49,10 @@ const ResumeEditor = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-10 bg-gray-900 min-h-screen">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="flex p-10 bg-gray-900 min-h-screen">
+      <div className="w-full flex flex-row gap-8">
         {/* Resume Editor Section */}
-        <div className="bg-white p-6 text-black rounded-lg shadow-lg border border-gray-300">
+        <div className="bg-white p-6 text-black rounded-lg shadow-lg border border-gray-300 w-1/2">
           <h2 className="text-2xl font-bold text-gray-800">Edit Resume</h2>
           <div className="mt-4 space-y-4">
             {Object.entries(resume).map(([field, value]) =>
@@ -95,72 +95,93 @@ const ResumeEditor = () => {
           </div>
         </div>
 
-        {/* Resume Preview Section */}
-        <div className="flex items-center justify-center">
-          <div
-            className="bg-white p-8 shadow-lg border border-gray-300 rounded-lg"
-            style={{
-              width: "210mm",
-              minHeight: "297mm",
-              padding: "20mm",
-              boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
-            <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
-            <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
-            <p className="text-gray-700 text-sm font-medium">
-              <a
-                href={`https://${resume.website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline"
-              >
-                {resume.websiteText}
-              </a>
-            </p>
+        {/* Resume Preview Section - A4 Paper Size */}
+        <div
+          className="bg-white p-8 shadow-lg border border-gray-300 rounded-lg w-1/2"
+          style={{
+            width: "210mm",
+            height: "297mm",
+            overflow: "auto",
+            marginTop: "10px",
+            marginBottom: "10px",
+            boxSizing: "border-box",
+          }}
+        >
+          <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
+          <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
+          <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
+          <p className="text-gray-700 text-sm font-medium">
+            <a
+              href={`https://${resume.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              {resume.websiteText}
+            </a>
+          </p>
 
-            <section className="mt-6">
-              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Summary</h2>
-              <p className="text-gray-700 text-sm mt-2">{resume.summary}</p>
-            </section>
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Summary</h2>
+            <p className="text-gray-700 text-sm mt-2">{resume.summary}</p>
+          </section>
 
-            <section className="mt-6">
-              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Work Experience</h2>
-              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-                {resume.experience.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </section>
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Work Experience</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.experience.map((item, index) => (
+                <li key={index} className="mb-2">
+                  <div className="font-semibold">{item.split(" (")[0]}</div>
+                  <div className="text-sm">{item.split(" (")[1]}</div>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-            <section className="mt-6">
-              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Education</h2>
-              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-                {resume.education.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </section>
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Education</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.education.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
 
-            <section className="mt-6">
-              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Skills</h2>
-              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-                {resume.skills.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </section>
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Skills</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.skills.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
 
-            <section className="mt-6">
-              <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Certifications</h2>
-              <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-                {resume.certifications.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          </div>
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Languages</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.languages.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Certifications</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.certifications.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mt-6">
+            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Achievements</h2>
+            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
+              {resume.achievements.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
     </div>
