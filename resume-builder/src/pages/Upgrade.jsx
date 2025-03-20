@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const pricingPlans = [
   {
     title: "Free Plan",
     price: "$0",
-    amount: 0,
     features: [
       "3 Free Templates",
       "Basic ATS Scoring",
@@ -19,44 +21,34 @@ const pricingPlans = [
     isPremium: false,
   },
   {
-    title: "Premium Plan",
+    title: "Premium Monthly",
     price: "$9.99/month",
-    amount: 999,
+    priceId: import.meta.env.VITE_STRIPE_PRICE_ID_PRO_MONTHLY,
     features: [
       "10 Premium Templates",
-      "Advanced ATS Scoring & Suggestions",
-      "High-Quality PDF (No Watermark)",
+      "Advanced ATS Scoring",
+      "No Watermark PDFs",
       "Priority Support",
-      "Unlimited Resume Edits",
+      "Unlimited Edits",
     ],
-    buttonText: "Upgrade Now",
+    buttonText: "Subscribe Monthly",
     isPremium: true,
   },
   {
-    title: "Lifetime Plan",
-    price: "$99 (One-Time)",
-    amount: 9900,
+    title: "Premium Yearly",
+    price: "$99/year",
+    priceId: import.meta.env.VITE_STRIPE_PRICE_ID_PRO_YEARLY,
     features: [
       "All Future Templates",
       "AI-Powered Resume Writing",
       "Expert Resume Review",
-      "Access to All Features Forever",
+      "All Features Unlocked",
       "Premium Customer Support",
     ],
-    buttonText: "Go Lifetime",
+    buttonText: "Subscribe Yearly",
     isPremium: true,
   },
 ];
-
-const loadRazorpay = async () => {
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
 
 const Upgrade = () => {
   const [timeLeft, setTimeLeft] = useState(48 * 60 * 60);
@@ -75,40 +67,30 @@ const Upgrade = () => {
     return `${hours}h ${minutes}m ${secs}s`;
   };
 
-  const handlePayment = async (plan) => {
-    const res = await loadRazorpay();
-    if (!res) {
-      alert("Razorpay SDK failed to load. Check your connection.");
-      return;
+  const handleStripeCheckout = async (priceId) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+
+      const { sessionId } = await response.json();
+      const stripe = await stripePromise;
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+
+      if (error) {
+        console.error("Stripe Checkout Error:", error);
+        alert("Failed to redirect to checkout.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Something went wrong.");
     }
-
-    const options = {
-      key: "YOUR_RAZORPAY_KEY",
-      amount: plan.amount * 100,
-      currency: "INR",
-      name: "Resume Builder Pro",
-      description: `Purchase ${plan.title}`,
-      image: "/logo.png",
-      handler: function (response) {
-        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-      },
-      prefill: {
-        name: "John Doe",
-        email: "johndoe@example.com",
-        contact: "9876543210",
-      },
-      theme: {
-        color: "#F37254",
-      },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
   };
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 text-center text-white relative">
-      {/* Animated Limited Offer Banner */}
       <motion.div
         className="absolute top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-yellow-400 text-white py-3 text-lg font-bold shadow-lg"
         initial={{ scale: 0.9, opacity: 0.8 }}
@@ -118,7 +100,7 @@ const Upgrade = () => {
         🎉 Limited Time Offer! Ends in <span className="font-extrabold">{formatTime(timeLeft)}</span>
       </motion.div>
 
-      <h1 className="text-5xl font-extrabold text-yellow-400 mt-16 mb-6">Upgrade Your Resume </h1>
+      <h1 className="text-5xl font-extrabold text-yellow-400 mt-16 mb-6">Upgrade Your Resume</h1>
       <p className="text-lg text-gray-300 mb-8">Get premium templates, AI resume suggestions, and much more!</p>
 
       <div className="flex justify-center gap-8 flex-wrap">
@@ -146,7 +128,7 @@ const Upgrade = () => {
             </ul>
             {plan.isPremium ? (
               <button
-                onClick={() => handlePayment(plan)}
+                onClick={() => handleStripeCheckout(plan.priceId)}
                 className="bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:opacity-90 w-full transition-all"
               >
                 {plan.buttonText}
