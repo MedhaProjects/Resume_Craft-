@@ -1,65 +1,44 @@
 import { Link } from "react-router-dom";
+import { FaHome, FaPalette, FaCrown, FaChartLine, FaRegFileAlt, FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-gray-400 py-8 mt-15 text-center">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          {/* Logo and Trustpilot */}
-          <div className="text-left mb-4 md:mb-0">
-            <h2 className="text-xl font-bold text-purple-500">Resume Builder</h2>
-            <div className="flex items-center mt-2">
-              <img src="/trustpilot.png" alt="Trustpilot" className="w-24" />
-              <p className="text-sm ml-2">TrustScore 4.2 | 791 reviews</p>
-            </div>
-          </div>
-          {/* Navigation Links */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <div>
-              <h3 className="font-semibold text-white">Build Your Resume</h3>
-              <ul className="mt-2 space-y-1">
-                <li><Link to="/ai-builder" className="hover:text-purple-500">AI Resume Builder</Link></li>
-                <li><Link to="/examples" className="hover:text-purple-500">Basic Resume Examples</Link></li>
-                <li><Link to="/how-to-write" className="hover:text-purple-500">How To Write a Resume</Link></li>
-                <li><Link to="/app" className="hover:text-purple-500">Resume Builder App</Link></li>
-                <li><Link to="/cover-letter" className="hover:text-purple-500">Cover Letter Builder</Link></li>
-                <li><Link to="/resume-templates" className="hover:text-purple-500">Resume Templates</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Career Resources</h3>
-              <ul className="mt-2 space-y-1">
-                <li><Link to="/make-resume" className="hover:text-purple-500">How To Make a Resume</Link></li>
-                <li><Link to="/summary" className="hover:text-purple-500">Professional Resume Summary</Link></li>
-                <li><Link to="/formats" className="hover:text-purple-500">Best Resume Formats</Link></li>
-                <li><Link to="/fonts" className="hover:text-purple-500">Best Fonts for Your Resume</Link></li>
-                <li><Link to="/references" className="hover:text-purple-500">How To List References</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">About Resume Builder</h3>
-              <ul className="mt-2 space-y-1">
-                <li><Link to="/about" className="hover:text-purple-500">Dashboard</Link></li>
-                <li><Link to="/contact" className="hover:text-purple-500">Tempalte</Link></li>
-                <li><Link to="/privacy" className="hover:text-purple-500">Upgrade</Link></li>
-                <li><Link to="/terms" className="hover:text-purple-500">Resume Type</Link></li>
-                <li><Link to="/press" className="hover:text-purple-500">Ats Checker</Link></li>
-                <li><Link to="/accessibility" className="hover:text-purple-500">Accessibility</Link></li>
-                <li><Link to="/do-not-sell" className="hover:text-purple-500">Do Not Sell or Share</Link></li>
-              </ul>
-            </div>
-          </div>
+    <footer className="w-full bg-black text-white py-8">
+      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
+        {/* Logo & Tagline */}
+        <div className="text-center md:text-left mb-6 md:mb-0">
+          <h1 className="text-2xl font-bold text-yellow-500">Resume Craft</h1>
+          <p className="text-gray-400 text-sm mt-2">Craft your perfect resume with ease.</p>
         </div>
-        {/* Social Media Icons */}
-        <div className="flex justify-center space-x-4 text-xl text-gray-500">
-          <a href="#" className="hover:text-purple-500">🔗</a>
-          <a href="#" className="hover:text-purple-500">❌</a>
-          <a href="#" className="hover:text-purple-500">📸</a>
-          <a href="#" className="hover:text-purple-500">🎵</a>
-          <a href="#" className="hover:text-purple-500">📘</a>
+
+        {/* Navigation Links */}
+        <div className="flex flex-wrap justify-center space-x-6 text-gray-300 mb-6 md:mb-0">
+          <Link to="/" className="hover:text-yellow-500 transition-all duration-300">Dashboard</Link>
+          <Link to="/template" className="hover:text-yellow-500 transition-all duration-300">Template</Link>
+          <Link to="/upgrade" className="hover:text-yellow-500 transition-all duration-300">Upgrade</Link>
+          <Link to="/resume-types" className="hover:text-yellow-500 transition-all duration-300">Resume Types</Link>
+          <Link to="/ats" className="hover:text-yellow-500 transition-all duration-300">ATS</Link>
+          <Link to="/build-resume" className="hover:text-yellow-500 transition-all duration-300">Build Resume</Link>
         </div>
-        {/* Copyright */}
-        <p className="text-sm text-gray-500 mt-4">© {new Date().getFullYear()}, Bold Limited. All rights reserved.</p>
+
+        {/* Social Media Links */}
+        <div className="flex space-x-4">
+          <a href="#" className="text-gray-400 hover:text-yellow-500 transition-all duration-300 text-xl"><FaFacebook /></a>
+          <a href="#" className="text-gray-400 hover:text-yellow-500 transition-all duration-300 text-xl"><FaTwitter /></a>
+          <a href="#" className="text-gray-400 hover:text-yellow-500 transition-all duration-300 text-xl"><FaInstagram /></a>
+          <a href="#" className="text-gray-400 hover:text-yellow-500 transition-all duration-300 text-xl"><FaLinkedin /></a>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-700 mt-6"></div>
+
+      {/* Copyright and Contact Info */}
+      <div className="text-center mt-4">
+        <p className="text-sm text-gray-400">&copy; {new Date().getFullYear()} Resume Craft. All rights reserved.</p>
+        <p className="text-sm text-gray-400">
+          Contact us at: <a href="mailto:support@resumecraft.com" className="text-yellow-500 hover:underline">support@resumecraft.com</a>
+        </p>
       </div>
     </footer>
   );
