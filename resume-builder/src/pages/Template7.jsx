@@ -2,219 +2,357 @@ import React, { useState } from "react";
 
 const ResumeTemplate = () => {
   const [data, setData] = useState({
-    name: "RICHARD SANCHEZ",
-    title: "MARKETING MANAGER",
-    contact: {
-      phone: "+123-456-7890",
-      email: "hello@reallygreatsite.com",
-      address: "123 Anywhere St, Any City",
-      website: "www.reallygreatsite.com",
-    },
-    education: [
-      {
-        year: "2029 - 2030",
-        university: "WARDIERE UNIVERSITY",
-        degree: "Master of Business Management",
-      },
-      {
-        year: "2025 - 2029",
-        university: "WARDIERE UNIVERSITY",
-        degree: "Bachelor of Business",
-        gpa: "GPA: 3.8 / 4.0",
-      },
-    ],
-    skills: [
-      "Project Management",
-      "Public Relations",
-      "Teamwork",
-      "Time Management",
-      "Leadership",
-      "Effective Communication",
-      "Critical Thinking",
-    ],
-    languages: {
-      English: "Fluent",
-      French: "Fluent",
-      German: "Basic",
-      Spanish: "Intermediate",
-    },
-    workExperience: [
-      {
-        company: "Borcelle Studio",
-        period: "2030 - PRESENT",
-        role: "Marketing Manager & Specialist",
-        responsibilities: [
-          "Develop and execute comprehensive marketing strategies.",
-          "Lead, mentor, and manage a high-performing marketing team.",
-          "Monitor brand consistency across marketing channels and materials.",
-        ],
-      },
-      {
-        company: "Fauget Studio",
-        period: "2025 - 2029",
-        role: "Marketing Manager & Specialist",
-        responsibilities: [
-          "Create and manage the marketing budget.",
-          "Oversee market research to identify emerging trends.",
-          "Monitor brand consistency across marketing channels and materials.",
-        ],
-      },
-    ],
-    references: [
-      {
-        name: "Estelle Darcy",
-        position: "CTO, Wardiere Inc.",
-        phone: "123-456-7890",
-        email: "hello@reallygreatsite.com",
-      },
-    ],
+    name: "",
+    title: "",
+    contact: "",
+    email: "",
+    summary: "",
+    skills: [""],
+    experience: [{ company: "", duration: "", details: "" }],
+    education: [{ degree: "", institution: "", year: "" }],
+    projects: "",
+    certificates: [""],
+    achievements: [""],
+    languages: [""],
   });
 
-  const handleChange = (section, key, index, event) => {
-    const value = event.target.value;
-    setData((prevData) => {
-      const updatedData = { ...prevData };
-      if (Array.isArray(updatedData[section])) {
-        updatedData[section][index][key] = value;
-      } else if (typeof updatedData[section] === "object") {
-        updatedData[section][key] = value;
-      } else {
-        updatedData[section] = value;
-      }
-      return updatedData;
-    });
+  // Handle simple input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  };
+
+  // Handle changes for array inputs
+  const handleArrayChange = (index, e, field, subfield) => {
+    const { value } = e.target;
+    const updatedArray = [...data[field]];
+    updatedArray[index] = subfield
+      ? { ...updatedArray[index], [subfield]: value }
+      : value;
+    setData({ ...data, [field]: updatedArray });
+  };
+
+  // Add new empty array field
+  const addArrayField = (field) => {
+    const newField =
+      field === "experience"
+        ? { company: "", duration: "", details: "" }
+        : field === "education"
+        ? { degree: "", institution: "", year: "" }
+        : "";
+    setData({ ...data, [field]: [...data[field], newField] });
+  };
+
+  // Remove a field from an array
+  const removeArrayField = (field, index) => {
+    const updatedArray = [...data[field]];
+    updatedArray.splice(index, 1);
+    setData({ ...data, [field]: updatedArray });
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-lg p-8 border rounded-lg font-sans text-black">
-      {/* Name & Title Section */}
-      <div className="flex flex-col border-b pb-4 mb-4">
-        <input
-          type="text"
-          value={data.name}
-          onChange={(e) => handleChange("name", null, null, e)}
-          className="text-3xl font-bold text-black w-full"
-        />
-        <input
-          type="text"
-          value={data.title}
-          onChange={(e) => handleChange("title", null, null, e)}
-          className="text-lg text-black w-full mt-2"
-        />
-      </div>
+    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen">
+      {/* Input Section */}
+      <div className="w-1/3 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
+        <h2 className="text-xl font-bold mb-4 text-center">
+          Enter Resume Details
+        </h2>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Contact & Education Section */}
-        <div className="col-span-1 bg-gray-100 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold border-b pb-2 mb-2 text-black">Contact</h2>
-          {Object.entries(data.contact).map(([key, value]) => (
-            <input
-              key={key}
-              type="text"
-              value={value}
-              onChange={(e) => handleChange("contact", key, null, e)}
-              className="w-full mt-1 text-black"
-            />
-          ))}
+        {/* Basic Info */}
+        {["name", "title", "contact", "email"].map((field) => (
+          <input
+            key={field}
+            name={field}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={data[field]}
+            onChange={handleChange}
+            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        ))}
 
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Education</h2>
-          {data.education.map((edu, index) => (
-            <div key={index} className="mt-2">
+        {/* Summary */}
+        <textarea
+          name="summary"
+          placeholder="Summary"
+          value={data.summary}
+          onChange={handleChange}
+          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+
+        {/* Experience Section */}
+        <h3 className="font-semibold mt-4 text-lg">Experience</h3>
+        {data.experience.map((exp, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["company", "duration", "details"].map((field) => (
               <input
-                type="text"
-                value={`${edu.year} - ${edu.university} (${edu.degree})`}
-                onChange={(e) => handleChange("education", "degree", index, e)}
-                className="w-full text-black"
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={exp[field]}
+                onChange={(e) => handleArrayChange(index, e, "experience", field)}
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-            </div>
-          ))}
-
-          {/* Skills Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Skills</h2>
-          <ul>
-            {data.skills.map((skill, index) => (
-              <li key={index} className="mt-1">
-                <input
-                  type="text"
-                  value={skill}
-                  onChange={(e) => handleChange("skills", index, null, e)}
-                  className="w-full text-black"
-                />
-              </li>
             ))}
-          </ul>
+            <button
+              onClick={() => removeArrayField("experience", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("experience")}
+          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Experience
+        </button>
 
-          {/* Languages Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">Languages</h2>
-          {Object.entries(data.languages).map(([language, level], index) => (
-            <div key={index} className="mt-1">
+        {/* Education Section */}
+        <h3 className="font-semibold mt-4 text-lg">Education</h3>
+        {data.education.map((edu, index) => (
+          <div
+            key={index}
+            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
+          >
+            {["degree", "institution", "year"].map((field) => (
               <input
-                type="text"
-                value={`${language}: ${level}`}
-                onChange={(e) => handleChange("languages", language, null, e)}
-                className="w-full text-black"
+                key={field}
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={edu[field]}
+                onChange={(e) => handleArrayChange(index, e, "education", field)}
+                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
-            </div>
-          ))}
+            ))}
+            <button
+              onClick={() => removeArrayField("education", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("education")}
+          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Education
+        </button>
 
-          {/* References Section */}
-          <h2 className="text-xl font-semibold border-b pb-2 mt-4 text-black">References</h2>
-          {data.references.map((ref, index) => (
-            <div key={index} className="mt-2">
-              <input
-                type="text"
-                value={`${ref.name} - ${ref.position}`}
-                onChange={(e) => handleChange("references", "name", index, e)}
-                className="w-full text-black"
-              />
-              <input
-                type="text"
-                value={ref.phone}
-                onChange={(e) => handleChange("references", "phone", index, e)}
-                className="w-full mt-1 text-black"
-              />
-              <input
-                type="text"
-                value={ref.email}
-                onChange={(e) => handleChange("references", "email", index, e)}
-                className="w-full mt-1 text-black"
-              />
-            </div>
-          ))}
-        </div>
+        {/* Skills Section */}
+        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
+        {data.skills.map((skill, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={skill}
+              onChange={(e) => handleArrayChange(index, e, "skills")}
+              placeholder="Skill"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => removeArrayField("skills", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("skills")}
+          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Skill
+        </button>
 
-        {/* Work Experience Section */}
-        <div className="col-span-2">
-          <h2 className="text-xl font-semibold border-b pb-2 text-black">Work Experience</h2>
-          {data.workExperience.map((job, index) => (
-            <div key={index} className="mt-4">
-              <input
-                type="text"
-                value={`${job.company} (${job.period}) - ${job.role}`}
-                onChange={(e) => handleChange("workExperience", "role", index, e)}
-                className="w-full font-bold text-black"
-              />
-              {job.responsibilities.map((task, idx) => (
-                <input
-                  key={idx}
-                  type="text"
-                  value={task}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setData((prevData) => {
-                      const updatedData = { ...prevData };
-                      updatedData.workExperience[index].responsibilities[idx] = value;
-                      return updatedData;
-                    });
-                  }}
-                  className="w-full mt-1 text-black"
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+        {/* Languages Section */}
+        <h3 className="font-semibold mt-4 text-lg">Languages</h3>
+        {data.languages.map((lang, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={lang}
+              onChange={(e) => handleArrayChange(index, e, "languages")}
+              placeholder="Language"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <button
+              onClick={() => removeArrayField("languages", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("languages")}
+          className="bg-pink-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Language
+        </button>
+
+        {/* Certificates Section */}
+        <h3 className="font-semibold mt-4 text-lg">Certificates</h3>
+        {data.certificates.map((cert, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={cert}
+              onChange={(e) => handleArrayChange(index, e, "certificates")}
+              placeholder="Certificate"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+            <button
+              onClick={() => removeArrayField("certificates", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("certificates")}
+          className="bg-orange-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Certificate
+        </button>
+
+        {/* Achievements Section */}
+        <h3 className="font-semibold mt-4 text-lg">Achievements</h3>
+        {data.achievements.map((ach, index) => (
+          <div key={index} className="relative mb-2">
+            <input
+              value={ach}
+              onChange={(e) => handleArrayChange(index, e, "achievements")}
+              placeholder="Achievement"
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              onClick={() => removeArrayField("achievements", index)}
+              className="text-red-500 text-sm absolute top-2 right-2"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addArrayField("achievements")}
+          className="bg-teal-500 text-white px-4 py-1 rounded-full mt-2 w-full"
+        >
+          + Add Achievement
+        </button>
       </div>
+
+{/* Resume Preview Section */}
+<div className="w-2/3 bg-white text-black p-12 shadow-2xl rounded-3xl border border-gray-300">
+  {/* Header */}
+  <div className="pb-8 mb-8 text-center border-b border-gray-200">
+    <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">
+      {data.name || "Rachelle Beaudry"}
+    </h1>
+    <p className="text-lg text-gray-600 mt-1">{data.title || "Accounting Executive"}</p>
+    <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+      {data.contact || "123 Anywhere St, Any City"} <br />
+      <span className="text-blue-700">{data.email || "hello@realityestate.com"}</span> <br />
+      
+    </p>
+  </div>
+
+  {/* Summary */}
+  <div className="mb-8 bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200">
+    <h3 className="font-semibold text-xl text-blue-800 mb-3">Professional Summary</h3>
+    <p className="text-gray-700 leading-relaxed">
+      {data.summary || "Results-driven Accounting Executive with a proven record of optimizing financial performance. Expertise in strategic financial initiatives and team leadership. Seeking a challenging executive role to leverage analytical skills and drive organizational success."}
+    </p>
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Work Experience */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Work Experience</h3>
+    {data.experience.map((exp, index) => (
+      <div key={index} className="mb-6 p-6 bg-gray-50 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all">
+        <p className="font-bold text-lg text-gray-800">{exp.company}</p>
+        <p className="text-sm text-gray-500">{exp.duration}</p>
+        <ul className="list-disc ml-5 text-gray-700 mt-3 space-y-2">
+          {exp.details.split("\n").map((line, i) => (
+            <li key={i} className="text-sm">{line}</li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Skills */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Core Skills</h3>
+    <div className="grid grid-cols-2 gap-3">
+      {data.skills.map((skill, index) => (
+        <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
+          {skill || "Skill"}
+        </p>
+      ))}
     </div>
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Education */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Education</h3>
+    {data.education.map((edu, index) => (
+      <div key={index} className="mb-4 p-6 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+        <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
+        <p className="text-sm text-gray-500">{edu.institution}</p>
+        <p className="text-gray-700 text-sm">{edu.year}</p>
+      </div>
+    ))}
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Certifications */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Certifications & Short Courses</h3>
+    <ul className="list-disc pl-5 text-gray-700 space-y-2">
+      {data.certificates.map((cert, index) => (
+        <li key={index} className="text-sm hover:text-blue-700 transition-all">{cert}</li>
+      ))}
+    </ul>
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Achievements */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Additional Achievements</h3>
+    <ul className="list-disc pl-5 text-gray-700 space-y-2">
+      {data.achievements.map((ach, index) => (
+        <li key={index} className="text-sm hover:text-blue-700 transition-all">{ach}</li>
+      ))}
+    </ul>
+  </div>
+  <div className="border-t border-gray-300 mb-8"></div>
+
+  {/* Languages */}
+  <div className="mb-8">
+    <h3 className="font-semibold text-xl text-blue-800 mb-4">Languages</h3>
+    <ul className="flex flex-wrap gap-2 text-gray-700">
+      {data.languages.map((lang, index) => (
+        <li key={index} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm border border-gray-200">
+          {lang || "Language"}
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+</div>
+
+  
+
+
+
+
   );
 };
 
