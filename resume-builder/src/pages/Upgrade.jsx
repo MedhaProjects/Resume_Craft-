@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const pricingPlans = [
   {
@@ -58,6 +59,22 @@ const loadRazorpay = async () => {
 };
 
 const Upgrade = () => {
+  const [timeLeft, setTimeLeft] = useState(48 * 60 * 60);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
+  };
+
   const handlePayment = async (plan) => {
     const res = await loadRazorpay();
     if (!res) {
@@ -66,8 +83,8 @@ const Upgrade = () => {
     }
 
     const options = {
-      key: "YOUR_RAZORPAY_KEY", // Replace with your Razorpay Key ID
-      amount: plan.amount,
+      key: "YOUR_RAZORPAY_KEY",
+      amount: plan.amount * 100,
       currency: "INR",
       name: "Resume Builder Pro",
       description: `Purchase ${plan.title}`,
@@ -90,17 +107,36 @@ const Upgrade = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-10 text-center text-white">
-      <h1 className="text-4xl font-bold text-yellow-400 mb-6">Upgrade Your Resume Builder</h1>
-      <p className="text-lg text-gray-300 mb-8">Get access to premium templates, AI suggestions, and more!</p>
+    <div className="min-h-screen bg-gray-900 py-12 text-center text-white relative">
+      {/* Animated Limited Offer Banner */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-yellow-400 text-white py-3 text-lg font-bold shadow-lg"
+        initial={{ scale: 0.9, opacity: 0.8 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+      >
+        🎉 Limited Time Offer! Ends in <span className="font-extrabold">{formatTime(timeLeft)}</span>
+      </motion.div>
 
-      <div className="flex justify-center gap-6 flex-wrap">
+      <h1 className="text-5xl font-extrabold text-yellow-400 mt-16 mb-6">Upgrade Your Resume </h1>
+      <p className="text-lg text-gray-300 mb-8">Get premium templates, AI resume suggestions, and much more!</p>
+
+      <div className="flex justify-center gap-8 flex-wrap">
         {pricingPlans.map((plan, index) => (
-          <div key={index} className={`bg-gray-800 text-white p-6 rounded-lg shadow-lg w-80 relative ${plan.isPremium ? "border-2 border-yellow-400" : ""}`}>
+          <motion.div
+            key={index}
+            className={`relative bg-gray-800 text-white p-8 rounded-xl shadow-lg w-80 transform transition-all ${
+              plan.isPremium ? "border-2 border-yellow-400" : ""
+            }`}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.2 }}
+            whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(255, 215, 0, 0.5)" }}
+          >
             {plan.isPremium && <FaCrown className="text-yellow-400 text-3xl absolute top-4 right-4" />}
-            <h2 className="text-2xl font-semibold text-yellow-300">{plan.title}</h2>
-            <p className="text-xl font-bold text-green-400 my-2">{plan.price}</p>
-            <ul className="text-left space-y-2 mb-4">
+            <h2 className="text-3xl font-bold text-yellow-300">{plan.title}</h2>
+            <p className="text-xl font-extrabold text-green-400 my-3">{plan.price}</p>
+            <ul className="text-left space-y-3 mb-5">
               {plan.features.map((feature, idx) => (
                 <li key={idx} className="flex items-center">
                   <FaCheckCircle className="text-green-400 mr-2" />
@@ -109,15 +145,21 @@ const Upgrade = () => {
               ))}
             </ul>
             {plan.isPremium ? (
-              <button onClick={() => handlePayment(plan)} className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 w-full">
+              <button
+                onClick={() => handlePayment(plan)}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:opacity-90 w-full transition-all"
+              >
                 {plan.buttonText}
               </button>
             ) : (
-              <Link to={plan.link} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full block text-center">
+              <Link
+                to={plan.link}
+                className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 w-full block text-center transition-all"
+              >
                 {plan.buttonText}
               </Link>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
