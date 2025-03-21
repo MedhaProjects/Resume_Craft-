@@ -9,7 +9,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const pricingPlans = [
   {
     title: "Free Plan",
-    price: "$0",
+    price: "₹0",
     features: [
       "3 Free Templates",
       "Basic ATS Scoring",
@@ -22,7 +22,7 @@ const pricingPlans = [
   },
   {
     title: "Premium Monthly",
-    price: "$9.99/month",
+    price: "   ₹199/month",
     priceId: import.meta.env.VITE_STRIPE_PRICE_ID_PRO_MONTHLY,
     features: [
       "10 Premium Templates",
@@ -36,7 +36,7 @@ const pricingPlans = [
   },
   {
     title: "Premium Yearly",
-    price: "$99/year",
+    price: "₹1999/year",
     priceId: import.meta.env.VITE_STRIPE_PRICE_ID_PRO_YEARLY,
     features: [
       "All Future Templates",
