@@ -1,191 +1,74 @@
-import React, { useState } from "react";
+import { useState, useRef } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-const ResumeEditor = () => {
-  const [resume, setResume] = useState({
-    name: "Daniel Gallego",
-    contact: "hello@reallygreatsite.com | 123 Anywhere St., Any City",
-    website: "www.reallygreatsite.com",
-    websiteText: "My Portfolio",
-    title: "UX Designer",
-    summary:
-      "Results-driven UX Designer with expertise in user research, wireframing, and prototyping. Adept at improving user engagement and satisfaction through intuitive designs.",
-    projects: [
-      "System UX Engineer, XarrowAI Industries (02/2021 - 12/2022) - Led UX research, improved customer engagement by 30%, designed wireframes.",
-      "Instant Chartz App, Morcelle Program (01/2023 - Present) - Developed user flows, enhanced UI design consistency, increased retention rate.",
-    ],
-    education: [
-      "Bachelor of Design in Process Engineering, Engineering University (05/2014 - 05/2016)",
-      "UX Industrial Basics and General Application, University of Engineering UX Cohort (08/2016 - 10/2019)",
-    ],
-    skills: [
-      "Prototyping Tools (Figma, Adobe XD)",
-      "User Research & Testing",
-      "Information Architecture",
-      "Interaction Design",
-      "Agile & Scrum Methodologies",
-    ],
-    languages: ["English (Fluent)", "French (Intermediate)", "Mandarin (Basic)"],
-    certifications: ["Professional Design Engineer (PDE) License"],
-    achievements: ["Most Innovative Employer of the Year (2021)"],
-  });
+export default function ResumeEditor() {
+  const [content, setContent] = useState("");
+  const editorRef = useRef(null);
 
-  const handleChange = (e, field) => {
-    setResume({ ...resume, [field]: e.target.value });
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
   };
 
-  const handleArrayChange = (e, field, index) => {
-    const newValues = [...resume[field]];
-    newValues[index] = e.target.value;
-    setResume({ ...resume, [field]: newValues });
-  };
-
-  const handleAdd = (field) => {
-    setResume({ ...resume, [field]: [...resume[field], ""] });
-  };
-
-  const handleRemove = (field, index) => {
-    const newValues = resume[field].filter((_, i) => i !== index);
-    setResume({ ...resume, [field]: newValues });
+  const downloadPDF = () => {
+    const element = document.getElementById("resume-preview");
+    html2canvas(element, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const doc = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      doc.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      doc.save("resume.pdf");
+    });
   };
 
   return (
-    <div className="flex p-10 bg-gray-900 min-h-screen">
-      <div className="w-full flex flex-row gap-8">
-        {/* Resume Editor Section */}
-        <div className="bg-white p-6 text-black rounded-lg shadow-lg border border-gray-300 w-1/2">
-          <h2 className="text-2xl font-bold text-gray-800">Edit Resume</h2>
-          <div className="mt-4 space-y-4">
-            {Object.entries(resume).map(([field, value]) =>
-              Array.isArray(value) ? (
-                <div key={field} className="mt-4">
-                  <h3 className="text-lg font-semibold text-gray-700 capitalize">{field.replace(/_/g, " ")}</h3>
-                  {value.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 mt-2">
-                      <input
-                        className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 text-black"
-                        value={item}
-                        onChange={(e) => handleArrayChange(e, field, index)}
-                      />
-                      <button
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
-                        onClick={() => handleRemove(field, index)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    className="bg-green-500 text-black px-3 py-1 mt-2 rounded-md hover:bg-green-600 transition"
-                    onClick={() => handleAdd(field)}
-                  >
-                    + Add {field.slice(0, -1)}
-                  </button>
-                </div>
-              ) : (
-                <label key={field} className="block text-gray-700">
-                  <span className="font-semibold capitalize">{field.replace(/_/g, " ")}:</span>
-                  <input
-                    className="w-full border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 mt-1 text-black"
-                    value={value}
-                    onChange={(e) => handleChange(e, field)}
-                  />
-                </label>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Resume Preview Section - A4 Paper Size */}
-        <div
-          className="bg-white p-8 shadow-lg border border-gray-300 rounded-lg w-1/2"
-          style={{
-            width: "210mm",
-            height: "297mm",
-            overflow: "auto",
-            marginTop: "10px",
-            marginBottom: "10px",
-            boxSizing: "border-box",
+    <div className="container mx-auto p-6 flex flex-col items-center">
+      <h2 className="text-3xl font-bold mb-6">Resume Editor</h2>
+      <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
+        <Editor
+          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+          initialValue={`<h1 style='text-align:center; font-size:24px; color:#2c3e50;'>ESTELLE DARCY</h1>
+            <h3 style='text-align:center; font-size:18px; color:#34495e;'>PROCESS ENGINEER</h3>
+            <p style='text-align:center; font-size:14px;'>123 Anywhere St., Any City | hello@reallygreatsite.com | www.reallygreatsite.com</p>
+            <hr>
+            <h2 style='color:#2980b9;'>SUMMARY</h2>
+            <p>Results-driven Process Engineer with 5+ years of experience in process design and automation...</p>
+            <h2 style='color:#2980b9;'>PROFESSIONAL EXPERIENCE</h2>
+            <h3>Instrument Tech, Morcelle Program | Jan 2024 - Present</h3>
+            <ul>
+              <li>Developed automation systems, improving efficiency by 30%...</li>
+              <li>Led cost-saving initiatives, reducing expenses by $500K...</li>
+            </ul>`}
+          init={{
+            height: 400,
+            menubar: true,
+            plugins: [
+              "lists", "table", "wordcount", "advlist", "autolink", "link", "charmap", "print", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "paste", "help", "wordcount"
+            ],
+            toolbar:
+              "undo redo | formatselect | bold italic underline | forecolor backcolor | alignleft aligncenter alignright | numlist bullist | table | link | removeformat",
           }}
-        >
-          <h1 className="text-4xl font-extrabold text-blue-700">{resume.name}</h1>
-          <p className="text-gray-700 mt-1 text-sm font-medium">{resume.title}</p>
-          <p className="text-gray-700 text-sm font-medium">{resume.contact}</p>
-          <p className="text-gray-700 text-sm font-medium">
-            <a
-              href={`https://${resume.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 underline"
-            >
-              {resume.websiteText}
-            </a>
-          </p>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Summary</h2>
-            <p className="text-gray-700 text-sm mt-2">{resume.summary}</p>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Projects</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.projects.map((item, index) => (
-                <li key={index} className="mb-2">
-                  <div className="font-semibold">{item.split(" (")[0]}</div>
-                  <div className="text-sm">{item.split(" (")[1]}</div>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Education</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.education.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Skills</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.skills.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Languages</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.languages.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Certifications</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.certifications.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-6">
-            <h2 className="text-lg font-bold text-blue-700 uppercase border-b pb-1">Achievements</h2>
-            <ul className="text-gray-700 text-sm mt-2 list-disc pl-5">
-              {resume.achievements.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        </div>
+          onEditorChange={handleEditorChange}
+          ref={editorRef}
+        />
       </div>
+      
+      <div
+        id="resume-preview"
+        className="mt-6 p-8 bg-white text-black shadow-xl border w-[210mm] h-[297mm] overflow-hidden rounded-lg"
+        style={{ fontFamily: "Arial, sans-serif", lineHeight: "1.5", color: "#2c3e50" }}
+      >
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </div>
+      
+      <button
+        onClick={downloadPDF}
+        className="mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Download as PDF
+      </button>
     </div>
   );
-};
-
-export default ResumeEditor;
+}
