@@ -1,314 +1,189 @@
-import React, { useState } from "react";
+import { useState, useRef } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-const ResumeTemplate = () => {
-  const [data, setData] = useState({
-    name: "",
-    title: "",
-    contact: "",
-    email: "",
-    summary: "",
-    skills: [""],
-    projects: [{ projectName: "", duration: "", description: "" }],
-    education: [{ degree: "", institution: "", year: "" }],
-    certificates: [""],
-    achievements: [""],
-    languages: [""],
-  });
+export default function ResumeEditor() {
+  const [content, setContent] = useState("");
+  const editorRef = useRef(null);
 
-  // Handle simple input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
   };
 
-  // Handle changes for array inputs
-  const handleArrayChange = (index, e, field) => {
-    const { value } = e.target;
-    const updatedArray = [...data[field]];
-    updatedArray[index] = value;
-    setData({ ...data, [field]: updatedArray });
-  };
+  const downloadPDF = () => {
+    const element = document.getElementById("resume-preview");
+    const originalStyle = element.getAttribute("style");
 
-  // Handle changes for array of objects inputs
-  const handleArrayObjectChange = (index, e, field, subfield) => {
-    const { value } = e.target;
-    const updatedArray = [...data[field]];
-    updatedArray[index] = { ...updatedArray[index], [subfield]: value };
-    setData({ ...data, [field]: updatedArray });
-  };
+    element.style.width = "794px";
+    element.style.minHeight = "1123px";
+    element.style.padding = "40px";
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#2c3e50";
 
-  // Add new empty array field
-  const addArrayField = (field) => {
-    const newField =
-      field === "projects"
-        ? { projectName: "", duration: "", description: "" }
-        : field === "education"
-        ? { degree: "", institution: "", year: "" }
-        : field === "skills" || field === "achievements" || field === "languages"
-        ? ""
-        : "";
-    setData({ ...data, [field]: [...data[field], newField] });
-  };
+    html2canvas(element, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
 
-  // Remove a field from an array
-  const removeArrayField = (field, index) => {
-    const updatedArray = [...data[field]];
-    updatedArray.splice(index, 1);
-    setData({ ...data, [field]: updatedArray });
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save("resume.pdf");
+      element.setAttribute("style", originalStyle || "");
+    });
   };
 
   return (
-    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen justify-center">
-      {/* Input Section */}
-      <div className="w-1/2 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
-        <h2 className="text-xl font-bold mb-4 text-center">Enter Resume Details</h2>
+    <div className="container mx-auto p-6 flex flex-col items-center">
+    {/* Top Bar */}
+    <div className="w-full flex justify-between items-center mb-6">
+    
+      <h2 className="text-3xl font-bold">Resume Editor</h2>
+      <div className="w-16"></div> {/* Placeholder for alignment */}
+    </div>
 
-        {/* Basic Info */}
-        {["name", "title", "contact", "email"].map((field) => (
-          <input
-            key={field}
-            name={field}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={data[field]}
-            onChange={handleChange}
-            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        ))}
+      <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
+                <Editor
+          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+          initialValue={`<div style='font-family: Arial, sans-serif; color: #2c3e50; font-size: 14px;'>
+  <h1 style='text-align:center; font-size:24px; font-weight:bold; color: #0a3d62;'>Medhavi Rampal</h1>
+  <p style='text-align:center;'>
+    📞 +91 8882376779 | 📧 medha8183@gmail.com | 🔗 <a href='https://linkedin.com/in/medhavi-rampal' target='_blank'>linkedin.com/in/medhavi-rampal</a> | 💻 <a href='https://github.com/medhavi' target='_blank'>github.com/medhavi</a>
+  </p>
 
-        {/* Summary */}
-        <textarea
-          name="summary"
-          placeholder="Professional Summary"
-          value={data.summary}
-          onChange={handleChange}
-          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+  <div style="height: 16px;"></div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Career Objective</h2>
+    <p>Highly motivated and detail-oriented BCA student with a strong foundation in computer science and cybersecurity. Seeking a challenging role to utilize technical skills and contribute to organizational growth.</p>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Education</h2>
+    <p><strong>Don Bosco Institute of Technology (GGIPU)</strong><br />BCA in Cyber Security (2022 – 2025) | CGPA: 9.12</p>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Internship Experience</h2>
+    <p><strong>XYZ Tech Solutions</strong> – Web Development Intern (June 2024 – Aug 2024)</p>
+    <ul>
+      <li>Built responsive websites using React.js and Tailwind CSS.</li>
+      <li>Worked with backend APIs and deployed projects using Vercel.</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Projects</h2>
+    <p><strong>Paws and Claws Care - Veterinary Care App</strong></p>
+    <ul>
+      <li>Technologies: Java, Android Studio, Firebase</li>
+      <li>Developed a pet healthcare system with appointment booking features.</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Certifications</h2>
+    <ul>
+      <li>Google Cybersecurity Professional Certificate</li>
+      <li>React Fundamentals – Coursera</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Technical Skills</h2>
+    <ul>
+      <li><strong>Web Development:</strong> HTML, CSS, JavaScript, React</li>
+      <li><strong>Mobile App:</strong> Android Studio</li>
+      <li><strong>Databases:</strong> MySQL, Firebase, MongoDB</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Soft Skills</h2>
+    <ul>
+      <li>Strong communication and teamwork</li>
+      <li>Time management and adaptability</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Achievements</h2>
+    <ul>
+      <li>Top 5 Finalist in Inter-College Hackathon 2023</li>
+      <li>Runner-up in college tech quiz competition</li>
+    </ul>
+  </div>
+
+  <div style='margin-bottom: 16px;'>
+    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Languages</h2>
+    <ul>
+      <li>English (Fluent)</li>
+      <li>Hindi (Native)</li>
+    </ul>
+  </div>
+
+</div>`}
+          init={{
+            height: 500,
+            menubar: false,
+            plugins: ["lists", "wordcount", "link", "preview"],
+            toolbar:
+              "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
+            content_style: `
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                color: #2c3e50;
+                line-height: 1.7;
+              }
+              h2 {
+                margin-top: 24px;
+                margin-bottom: 10px;
+              }
+              p, ul {
+                margin-bottom: 16px;
+              }
+            `,
+          }}
+          onEditorChange={handleEditorChange}
+          ref={editorRef}
         />
-
-        {/* Projects Section */}
-        <h3 className="font-semibold mt-4 text-lg">Projects</h3>
-        {data.projects.map((project, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["projectName", "duration", "description"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={project[field]}
-                onChange={(e) =>
-                  handleArrayObjectChange(index, e, "projects", field)
-                }
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("projects", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("projects")}
-          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Project
-        </button>
-
-        {/* Education Section */}
-        <h3 className="font-semibold mt-4 text-lg">Education</h3>
-        {data.education.map((edu, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["degree", "institution", "year"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={edu[field]}
-                onChange={(e) =>
-                  handleArrayObjectChange(index, e, "education", field)
-                }
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("education", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("education")}
-          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Education
-        </button>
-
-        {/* Skills Section */}
-        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
-        {data.skills.map((skill, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={skill}
-              onChange={(e) => handleArrayChange(index, e, "skills")}
-              placeholder="Skill"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={() => removeArrayField("skills", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("skills")}
-          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Skill
-        </button>
-
-        {/* Achievements Section */}
-        <h3 className="font-semibold mt-4 text-lg">Achievements</h3>
-        {data.achievements.map((achievement, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={achievement}
-              onChange={(e) => handleArrayChange(index, e, "achievements")}
-              placeholder="Achievement"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            <button
-              onClick={() => removeArrayField("achievements", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("achievements")}
-          className="bg-orange-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Achievement
-        </button>
-
-        {/* Languages Section */}
-        <h3 className="font-semibold mt-4 text-lg">Languages</h3>
-        {data.languages.map((language, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={language}
-              onChange={(e) => handleArrayChange(index, e, "languages")}
-              placeholder="Language"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
-            <button
-              onClick={() => removeArrayField("languages", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("languages")}
-          className="bg-teal-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Language
-        </button>
       </div>
 
-      {/* Resume Preview Section */}
       <div
-        className="w-1/2 bg-white text-black p-8 shadow-2xl rounded-3xl border border-gray-300"
-        style={{ maxWidth: "210mm", maxHeight: "297mm", margin: "0 auto", paddingBottom: "20px" }}
+        id="resume-preview"
+        className="mt-6 bg-white text-black shadow-xl border w-[794px] min-h-[1123px] p-[40px] rounded-lg"
+        style={{
+          fontFamily: "Arial, sans-serif",
+          fontSize: "14px",
+          lineHeight: "1.7",
+          color: "#2c3e50",
+          backgroundColor: "#ffffff",
+          overflow: "hidden",
+        }}
       >
-        {/* Header */}
-        <div className="pb-4 mb-4 text-center border-b border-gray-200">
-          <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">
-            {data.name || "Rachelle Beaudry"}
-          </h1>
-          <p className="text-lg text-gray-600 mt-1">{data.title || "Accounting Executive"}</p>
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-            {data.contact || "123 Anywhere St, Any City"} <br />
-            <span className="text-blue-700">{data.email || "hello@realityestate.com"}</span>
-          </p>
-        </div>
-
-        {/* Summary */}
-        <div className="mb-6 bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="font-semibold text-lg text-blue-800 mb-3">Professional Summary</h3>
-          <p className="text-gray-700 leading-relaxed">
-            {data.summary ||
-              "Results-driven Accounting Executive with a proven record of optimizing financial performance. Expertise in strategic financial initiatives and team leadership. Seeking a challenging executive role to leverage analytical skills and drive organizational success."}
-          </p>
-        </div>
-
-        {/* Projects */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Projects</h3>
-          {data.projects.map((project, index) => (
-            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-bold text-lg text-gray-800">{project.projectName}</p>
-              <p className="text-sm text-gray-500">{project.duration}</p>
-              <p className="text-gray-700 text-sm">{project.description}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Skills */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Core Skills</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {data.skills.map((skill, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {skill || "Skill"}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Education */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Education</h3>
-          {data.education.map((edu, index) => (
-            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
-              <p className="text-sm text-gray-500">{edu.institution}</p>
-              <p className="text-gray-700 text-sm">{edu.year}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Achievements & Languages */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Achievements & Languages</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {data.achievements.map((ach, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {ach || "Achievement"}
-              </p>
-            ))}
-            {data.languages.map((lang, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {lang || "Language"}
-              </p>
-            ))}
-          </div>
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
       </div>
+
+      <button
+        onClick={downloadPDF}
+        className="mt-6 px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Download as PDF
+      </button>
     </div>
   );
-};
-
-export default ResumeTemplate;
+}
