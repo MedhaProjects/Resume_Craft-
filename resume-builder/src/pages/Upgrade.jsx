@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { loadStripe } from "@stripe/stripe-js";
+import { auth } from "../firebase";
+
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { redirect } from "react-router-dom";
+import { fetchSubscriptionDataByEmail } from "../utils/utils";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -31,6 +36,7 @@ const pricingPlans = [
       "Priority Support",
       "Unlimited Edits",
     ],
+    age: 30, //days,
     buttonText: "Subscribe Monthly",
     isPremium: true,
   },
@@ -45,12 +51,15 @@ const pricingPlans = [
       "All Features Unlocked",
       "Premium Customer Support",
     ],
+    age: 365, //days,
     buttonText: "Subscribe Yearly",
     isPremium: true,
   },
 ];
 
 const Upgrade = () => {
+  const [user, setUser] = useState();
+  const [isPremiumUser, setIsPremiumUser] = useState();
   const [timeLeft, setTimeLeft] = useState(48 * 60 * 60);
 
   useEffect(() => {
@@ -67,28 +76,57 @@ const Upgrade = () => {
     return `${hours}h ${minutes}m ${secs}s`;
   };
 
-  const handleStripeCheckout = async (priceId) => {
+  const handleStripeCheckout = async (priceId, age, title) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/create-checkout-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
-      });
+      if (!user || !user.email) {
+        alert("login first...");
+        redirect("/auth");
+        return;
+      }
+      setUser(user);
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/create-checkout-session`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ priceId }),
+        }
+      );
 
       const { sessionId } = await response.json();
+
       const stripe = await stripePromise;
       const { error } = await stripe.redirectToCheckout({ sessionId });
-
       if (error) {
         console.error("Stripe Checkout Error:", error);
         alert("Failed to redirect to checkout.");
       }
+      // console.log(age,title,priceId,"check")
+      localStorage.setItem("firebaseTitle",title);
+      localStorage.setItem("firebasePriceId",priceId);
+      localStorage.setItem("firebaseAge",age);
+      localStorage.setItem("sessionId",sessionId);
     } catch (err) {
       console.error("Error:", err);
       alert("Something went wrong.");
     }
   };
 
+  // Listen for authentication status changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user && user.email) {
+      fetchSubscriptionDataByEmail(user.email)
+        .then((data) => setIsPremiumUser(data))
+        .catch((error) => console.error("Error fetching subscription:", error));
+    }
+  }, [user]);
   return (
     <div className="min-h-screen bg-gray-900 py-12 text-center text-white relative">
       <motion.div
@@ -97,11 +135,16 @@ const Upgrade = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
       >
-        🎉 Limited Time Offer! Ends in <span className="font-extrabold">{formatTime(timeLeft)}</span>
+        🎉 Limited Time Offer! Ends in{" "}
+        <span className="font-extrabold">{formatTime(timeLeft)}</span>
       </motion.div>
 
-      <h1 className="text-5xl font-extrabold text-yellow-400 mt-16 mb-6">Upgrade Your Resume</h1>
-      <p className="text-lg text-gray-300 mb-8">Get premium templates, AI resume suggestions, and much more!</p>
+      <h1 className="text-5xl font-extrabold text-yellow-400 mt-16 mb-6">
+        Upgrade Your Resume
+      </h1>
+      <p className="text-lg text-gray-300 mb-8">
+        Get premium templates, AI resume suggestions, and much more!
+      </p>
 
       <div className="flex justify-center gap-8 flex-wrap">
         {pricingPlans.map((plan, index) => (
@@ -113,11 +156,18 @@ const Upgrade = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
-            whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(255, 215, 0, 0.5)" }}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0px 10px 20px rgba(255, 215, 0, 0.5)",
+            }}
           >
-            {plan.isPremium && <FaCrown className="text-yellow-400 text-3xl absolute top-4 right-4" />}
+            {plan.isPremium && (
+              <FaCrown className="text-yellow-400 text-3xl absolute top-4 right-4" />
+            )}
             <h2 className="text-3xl font-bold text-yellow-300">{plan.title}</h2>
-            <p className="text-xl font-extrabold text-green-400 my-3">{plan.price}</p>
+            <p className="text-xl font-extrabold text-green-400 my-3">
+              {plan.price}
+            </p>
             <ul className="text-left space-y-3 mb-5">
               {plan.features.map((feature, idx) => (
                 <li key={idx} className="flex items-center">
@@ -128,10 +178,18 @@ const Upgrade = () => {
             </ul>
             {plan.isPremium ? (
               <button
-                onClick={() => handleStripeCheckout(plan.priceId)}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:opacity-90 w-full transition-all"
+                onClick={() =>
+                  handleStripeCheckout(plan.priceId, plan.age, plan.title)
+                }
+                className={`  ${
+                  isPremiumUser?.title == plan.title
+                    ? "bg-gradient-to-r from-green-500 to-blue-500"
+                    : "bg-gradient-to-r from-purple-500 to-blue-500"
+                }  text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:opacity-90 w-full transition-all`}
               >
-                {plan.buttonText}
+                {isPremiumUser?.title == plan.title
+                  ? "Subscribed"
+                  : plan.buttonText}
               </button>
             ) : (
               <Link

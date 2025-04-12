@@ -22,6 +22,7 @@ import Template7 from "./pages/Template7";
 import Template8 from "./pages/Template8";
 import Template9 from "./pages/Template9";
 import Template10 from "./pages/Template10";
+import Success from "./components/Success";
 const App = () => {
   return (
     <Router>
@@ -40,7 +41,8 @@ const App = () => {
           <Route path="/ats" element={<Ats />} />
           <Route path="/edit/:type" element={<ResumeEditor />} />
           <Route path="/build-resume" element={<BuildResume />} />
-
+          <Route path="/success" element={<Success />} />
+          <Route path="/profile" element={<Profile />} />
           {/* Template Pages */}
           <Route path="/template1" element={<Template1 />} />
           <Route path="/template2" element={<Template2 />} />

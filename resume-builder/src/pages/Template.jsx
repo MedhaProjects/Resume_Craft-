@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaCrown, FaTimes } from "react-icons/fa";
-import { auth } from "../firebase"; // Firebase import for authentication
+import { auth } from "../firebase"; 
 import { onAuthStateChanged } from "firebase/auth";
-
+import { fetchSubscriptionDataByEmail } from "../utils/utils";
 const templates = [
   { id: 1, name: "Experience-Basic", image: "/t5.png", path: "/template5", isPremium: false, category: "experience" },
   { id: 5, name: "Fresher-Basic", image: "/F1.png", path: "/template1", isPremium: false, category: "fresher" },
@@ -59,6 +59,14 @@ const TemplatePage = () => {
       setFilteredTemplates(templates.filter((t) => t.category === selectedFilter));
     }
   }, [selectedFilter]);
+  useEffect(() => {
+    if (user && user.email) {
+      fetchSubscriptionDataByEmail(user.email)
+        .then((data) => setIsPremiumUser(data))
+        .catch((error) => console.error("Error fetching subscription:", error));
+    }
+  }, [user]);
+
 
   return (
     <div className="min-h-screen bg-gray-900 py-10 text-center text-white px-5">
@@ -129,7 +137,7 @@ const TemplatePage = () => {
                   </>
                 ) : (
                   <>
-                    {template.isPremium && !isPremiumUser ? (
+                    {template.isPremium && !isPremiumUser && !isPremiumUser?.email? (
                       <>
                         <FaCrown className="text-yellow-400 text-4xl" />
                         <p>Subscribe to Unlock</p>
