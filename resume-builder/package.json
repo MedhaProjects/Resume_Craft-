@@ -13,9 +13,11 @@
     "@stripe/stripe-js": "^6.1.0",
     "@tailwindcss/vite": "^4.0.14",
     "@tinymce/tinymce-react": "^6.1.0",
+    "cloudinary": "^2.6.0",
     "framer-motion": "^12.6.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-router-dom": "^7.4.0",
     "resume-builder": "file:",
     "tailwindcss": "^4.0.14"

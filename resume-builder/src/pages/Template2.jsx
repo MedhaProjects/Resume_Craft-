@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { uploadResume } from "../utils/cloudinary.utils";
+import { auth } from "../firebase";
 
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
@@ -11,39 +13,49 @@ export default function ResumeEditor() {
     setContent(newContent);
   };
 
-  const downloadPDF = () => {
-    const element = document.getElementById("resume-preview");
-    const originalStyle = element.getAttribute("style");
-
-    element.style.width = "794px";
-    element.style.minHeight = "1123px";
-    element.style.padding = "40px";
-    element.style.backgroundColor = "#ffffff";
-    element.style.color = "#2c3e50";
-
-    html2canvas(element, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
+  const downloadPDF = async() => {
+    try {
+      const element = document.getElementById("resume-preview");
+      const originalStyle = element.getAttribute("style");
+  
+      element.style.width = "794px";
+      element.style.minHeight = "1123px";
+      element.style.padding = "40px";
+      element.style.backgroundColor = "#ffffff";
+      element.style.color = "#2c3e50";
+  
+      html2canvas(element, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+  
+        const pdf = new jsPDF("p", "mm", "a4");
+        let position = 0;
+  
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
-      }
+  
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+  
+        pdf.save("resume.pdf");
+        element.setAttribute("style", originalStyle || "");
+      });
 
-      pdf.save("resume.pdf");
-      element.setAttribute("style", originalStyle || "");
-    });
+
+      const user = auth.currentUser;
+      const resumeDetail = await  uploadResume(pdf,user.email);
+      console.log(resumeDetail,"res")
+    } catch (error) {
+      console.log(error);
+    }
+   
   };
 
   return (
