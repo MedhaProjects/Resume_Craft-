@@ -11,7 +11,7 @@ export default function ResumeEditor() {
     setContent(newContent);
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async() => {
     const element = document.getElementById("resume-preview");
     const originalStyle = element.getAttribute("style");
 
@@ -44,6 +44,8 @@ export default function ResumeEditor() {
       pdf.save("resume.pdf");
       element.setAttribute("style", originalStyle || "");
     });
+
+    await storeResume( "4", content);
   };
 
   return (

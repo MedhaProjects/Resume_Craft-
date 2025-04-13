@@ -19,19 +19,6 @@ export default function Profile() {
   const [user, setUser] = useState();
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
-  const userData = {
-    age: 2811776058794,
-    createdAt: "April 12, 2025 at 10:24:18 PM UTC+5:30",
-    email: "snhrampal@gmail.com",
-    priceId: "price_1R46C2AzpRjUcig16826lePz",
-    sessionId:
-      "cs_test_a1KfCrXxlNcUhSRZk2i5IWO65kZX8Kc2urAabgToKM3Yzpk4cQeGjEKr67",
-    status: "successful",
-    title: "Premium Yearly",
-    uid: "nLQZ1QAhX6aEufTu4MFaH2dzPYl1",
-  };
-
-  // Sample resume history
   const resumeHistory = [
     {
       id: 1,
@@ -108,7 +95,7 @@ export default function Profile() {
                 className="flex items-center gap-2 bg-[#00CFC6] text-[#101828] px-4 py-2 rounded-lg font-medium"
               >
                 <FaCrown className="text-[#101828]" />
-                <span>{data?.title}</span>
+                <span>{data?.title || "Freemly"}</span>
               </motion.div>
             </motion.header>
 
@@ -146,7 +133,7 @@ export default function Profile() {
                         </p>
                         <p className="font-medium text-gray-100">
                           {new Date(
-                            data?.createdAt.toDate()
+                            data?.createdAt.toDate() || Date.now()
                           ).toLocaleDateString()}
                         </p>
                       </div>
@@ -163,7 +150,7 @@ export default function Profile() {
                         <div className="flex items-center gap-2">
                           <FiCheckCircle className="text-green-400" />
                           <span className="font-medium capitalize text-gray-100">
-                            {data?.status}
+                            {data?.status || "-"}
                           </span>
                         </div>
                       </div>
@@ -178,7 +165,7 @@ export default function Profile() {
                           Subscription Expired
                         </p>
                         <p className="font-medium text-gray-100">
-                          {new Date(data?.age).toLocaleDateString()}
+                          {new Date(data?.age).toLocaleDateString() || "Unlimited"}
             
                         </p>
                       </div>
@@ -245,7 +232,7 @@ export default function Profile() {
                           Price ID
                         </h4>
                         <p className="font-mono text-sm text-gray-300 truncate">
-                          {data?.priceId}
+                          {data?.priceId || "-"}
                         </p>
                       </div>
                       <div>
@@ -253,7 +240,7 @@ export default function Profile() {
                           Session ID
                         </h4>
                         <p className="font-mono text-sm text-gray-300 truncate">
-                          {data?.sessionId}
+                          {data?.sessionId || "-"}
                         </p>
                       </div>
                     </div>
@@ -323,7 +310,7 @@ export default function Profile() {
                             User ID
                           </h4>
                           <p className="font-mono text-sm text-gray-300 truncate">
-                            {data?.uid}
+                            {data?.uid || user?.uid || "-"}
                           </p>
                         </div>
                         <button className="text-sm text-[#00CFC6] hover:text-[#00e0d6]">
@@ -335,7 +322,7 @@ export default function Profile() {
                           <h4 className="text-sm font-semibold text-gray-400">
                             Email
                           </h4>
-                          <p className="text-gray-300">{data?.email}</p>
+                          <p className="text-gray-300">{data?.email || user?.email || "sample@gmail.com"}</p>
                         </div>
                         <button className="text-sm text-[#00CFC6] hover:text-[#00e0d6]">
                           Verified
@@ -346,7 +333,7 @@ export default function Profile() {
                           Account Age
                         </h4>
                         <p className="text-gray-300">
-                          { new Date(data?.age).toLocaleDateString()}
+                          { new Date(data?.age || Date.now()).toLocaleDateString()}
                         </p>
                       </div>
                     </div>

@@ -11,7 +11,7 @@ export default function ResumeEditor() {
     setContent(newContent);
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async() => {
     const element = document.getElementById("resume-preview");
     html2canvas(element, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
@@ -38,6 +38,8 @@ export default function ResumeEditor() {
 
       pdf.save("resume.pdf");
     });
+
+    await storeResume( "3", content);
   };
 
   return (
