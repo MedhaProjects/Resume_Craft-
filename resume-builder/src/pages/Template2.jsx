@@ -1,74 +1,110 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { uploadResume } from "../utils/cloudinary.utils";
 import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
   const editorRef = useRef(null);
-
+  const [bolbResume, setbolbResume] = useState();
+  const [user, setUser] = useState();
+  const [data,setData] = useState();
   const handleEditorChange = (newContent) => {
     setContent(newContent);
   };
-
-  const downloadPDF = async() => {
+  let formData = new FormData();
+  const downloadPDF = async () => {
     try {
       const element = document.getElementById("resume-preview");
       const originalStyle = element.getAttribute("style");
-  
+
       element.style.width = "794px";
       element.style.minHeight = "1123px";
       element.style.padding = "40px";
       element.style.backgroundColor = "#ffffff";
       element.style.color = "#2c3e50";
-  
+
+    
       html2canvas(element, { scale: 2 }).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
         const imgWidth = 210;
         const pageHeight = 297;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         let heightLeft = imgHeight;
-  
+
         const pdf = new jsPDF("p", "mm", "a4");
         let position = 0;
-  
+
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
-  
+
         while (heightLeft > 0) {
           position = heightLeft - imgHeight;
           pdf.addPage();
           pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
           heightLeft -= pageHeight;
         }
-  
+
         pdf.save("resume.pdf");
         element.setAttribute("style", originalStyle || "");
+
+        // Convert PDF to blob for upload
+        const pdfBlob = pdf.output("blob");
+        formData.append("resume", pdfBlob, "resume.pdf");
+        formData.append("email", user?.email);
+
+        setbolbResume(pdfBlob);
       });
-
-
-      const user = auth.currentUser;
-      const resumeDetail = await  uploadResume(pdf,user.email);
-      console.log(resumeDetail,"res")
     } catch (error) {
       console.log(error);
     }
-   
   };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+  useEffect(() => {
+    (async function () {
+      try {
+        console.log(user?.email, bolbResume, "daata");
+        if (bolbResume && user?.email) {
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/resumeUpload`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                resume: bolbResume,
+                email: user?.email,
+                formData
+              }),
+            }
+          );
+
+          const result = await response.json();
+          console.log(result, "response");
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+      }
+    })();
+  }, [bolbResume, user]);
   return (
     <div className="container mx-auto p-6 flex flex-col items-center">
-    {/* Top Bar */}
-    <div className="w-full flex justify-between items-center mb-6">
-    
-      <h2 className="text-3xl font-bold">Resume Editor</h2>
-      <div className="w-16"></div> {/* Placeholder for alignment */}
-    </div>
+      {/* Top Bar */}
+      <div className="w-full flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold">Resume Editor</h2>
+        <div className="w-16"></div> {/* Placeholder for alignment */}
+      </div>
 
       <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
-                <Editor
+        <Editor
           apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
           initialValue={`<div style='font-family: Arial, sans-serif; color: #2c3e50; font-size: 14px;'>
   <h1 style='text-align:center; font-size:24px; font-weight:bold; color: #0a3d62;'>Medhavi Rampal</h1>

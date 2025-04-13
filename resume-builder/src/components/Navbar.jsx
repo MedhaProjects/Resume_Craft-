@@ -5,6 +5,7 @@ import { FaRegFileAlt } from "react-icons/fa"; // New icon for Build Your Resume
 import { useState, useEffect } from "react";
 import { auth } from "../firebase"; // Import Firebase authentication
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -30,33 +31,61 @@ const Navbar = () => {
 
       {/* Middle - Navigation Links */}
       <div className="space-x-8 hidden md:flex">
-        <Link to="/" className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300">
+        {user?.email && (
+          <Link
+            to="/profile"
+            className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+          >
+            <CgProfile className="transition-transform transform hover:scale-110" />
+            <span>Profile</span>
+          </Link>
+        )}
+
+        <Link
+          to="/"
+          className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+        >
           <FaHome className="transition-transform transform hover:scale-110" />
           <span>Dashboard</span>
         </Link>
-        <Link to="/template" className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300">
+        <Link
+          to="/template"
+          className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+        >
           <FaPalette className="transition-transform transform hover:scale-110" />
           <span>Template</span>
         </Link>
-        <Link to="/upgrade" className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300">
+        <Link
+          to="/upgrade"
+          className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+        >
           <FaCrown className="transition-transform transform hover:scale-110" />
           <span>Upgrade</span>
         </Link>
-        <Link to="/resume-types" className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300">
+        <Link
+          to="/resume-types"
+          className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+        >
           <FaChartLine className="transition-transform transform hover:scale-110" />
           <span>Resume Types</span>
         </Link>
-        <Link to="/ats" className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300">
+        <Link
+          to="/ats"
+          className="flex items-center space-x-2 text-gray-300 hover:text-yellow-500 transition-all duration-300"
+        >
           <FaChartLine className="transition-transform transform hover:scale-110" />
           <span>ATS</span>
         </Link>
 
         {/* Build Your Resume Button with new colors and icon */}
-        <Link to="/build-resume" className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg shadow-md transition-all duration-300 
-             bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
-  <FaRegFileAlt className="transition-transform transform hover:scale-110" />
-  <span>Build Your Resume</span>
-</Link>
+        <Link
+          to="/build-resume"
+          className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg shadow-md transition-all duration-300 
+             bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
+        >
+          <FaRegFileAlt className="transition-transform transform hover:scale-110" />
+          <span>Build Your Resume</span>
+        </Link>
       </div>
 
       {/* Right - Authentication Buttons */}
@@ -68,7 +97,10 @@ const Navbar = () => {
           <FiLogOut className="mr-2" /> Logout
         </button>
       ) : (
-        <Link to="/auth" className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg shadow-md hover:bg-purple-600 transition-all duration-300">
+        <Link
+          to="/auth"
+          className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg shadow-md hover:bg-purple-600 transition-all duration-300"
+        >
           <FiLogIn className="mr-2" /> Login / Sign Up
         </Link>
       )}

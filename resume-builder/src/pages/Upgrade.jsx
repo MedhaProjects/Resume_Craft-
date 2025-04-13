@@ -24,6 +24,7 @@ const pricingPlans = [
     buttonText: "Start for Free",
     link: "/template",
     isPremium: false,
+    age:0
   },
   {
     title: "Premium Monthly",

@@ -23,6 +23,7 @@ import Template8 from "./pages/Template8";
 import Template9 from "./pages/Template9";
 import Template10 from "./pages/Template10";
 import Success from "./components/Success";
+import Profile from "./pages/Profile";
 const App = () => {
   return (
     <Router>
