@@ -4,9 +4,12 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { storeResume } from "../utils/utils";
+import { getResume, storeResume } from "../utils/utils";
+import toast from "react-hot-toast";
+import { initialTemplate2Content } from "../utils/templateContent";
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
+  const [templateNumber] = useState("2");
   const editorRef = useRef(null);
   const [user, setUser] = useState();
   const handleEditorChange = (newContent) => {
@@ -57,6 +60,41 @@ export default function ResumeEditor() {
     return () => unsubscribe();
   }, []);
 
+
+
+
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const content = await getResume(templateNumber);
+        if(!content){
+          setContent(initialTemplate2Content)
+        }else{
+          setContent(content);
+        }
+        
+      } catch (error) {
+        setContent(initialTemplate2Content)
+        console.log(error);
+      }
+    })();
+  }, []);
+
+
+
+
+  const saveResumeContent = async () => {
+    try {
+      await storeResume(templateNumber, content);
+      toast.success("Resume is saved");
+    } catch (error) {
+      toast.error("something wen wrong, please try again");
+      console.log(error);
+    }
+  };
+
+
   return (
     <div className="container mx-auto p-6 flex flex-col items-center">
       {/* Top Bar */}
@@ -66,89 +104,30 @@ export default function ResumeEditor() {
       </div>
 
       <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
-        <Editor
+
+
+      <div className=" flex justify-between items-center mb-3">
+          <button
+            onClick={downloadPDF}
+            className=" px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          >
+            Download as PDF
+          </button>
+          <button
+            onClick={saveResumeContent}
+            className="w-[120px] h-[40px] bg-[#071a41] hover:bg-[#2b3955] text-white-400 font-semibold rounded-4xl cursor-pointer  items-end "
+          >
+            Save
+          </button>
+        </div>
+
+ <Editor
           apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-          initialValue={`<div style='font-family: Arial, sans-serif; color: #2c3e50; font-size: 14px;'>
-  <h1 style='text-align:center; font-size:24px; font-weight:bold; color: #0a3d62;'>Medhavi Rampal</h1>
-  <p style='text-align:center;'>
-    📞 +91 8882376779 | 📧 medha8183@gmail.com | 🔗 <a href='https://linkedin.com/in/medhavi-rampal' target='_blank'>linkedin.com/in/medhavi-rampal</a> | 💻 <a href='https://github.com/medhavi' target='_blank'>github.com/medhavi</a>
-  </p>
-
-  <div style="height: 16px;"></div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Career Objective</h2>
-    <p>Highly motivated and detail-oriented BCA student with a strong foundation in computer science and cybersecurity. Seeking a challenging role to utilize technical skills and contribute to organizational growth.</p>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Education</h2>
-    <p><strong>Don Bosco Institute of Technology (GGIPU)</strong><br />BCA in Cyber Security (2022 – 2025) | CGPA: 9.12</p>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Internship Experience</h2>
-    <p><strong>XYZ Tech Solutions</strong> – Web Development Intern (June 2024 – Aug 2024)</p>
-    <ul>
-      <li>Built responsive websites using React.js and Tailwind CSS.</li>
-      <li>Worked with backend APIs and deployed projects using Vercel.</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Projects</h2>
-    <p><strong>Paws and Claws Care - Veterinary Care App</strong></p>
-    <ul>
-      <li>Technologies: Java, Android Studio, Firebase</li>
-      <li>Developed a pet healthcare system with appointment booking features.</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Certifications</h2>
-    <ul>
-      <li>Google Cybersecurity Professional Certificate</li>
-      <li>React Fundamentals – Coursera</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Technical Skills</h2>
-    <ul>
-      <li><strong>Web Development:</strong> HTML, CSS, JavaScript, React</li>
-      <li><strong>Mobile App:</strong> Android Studio</li>
-      <li><strong>Databases:</strong> MySQL, Firebase, MongoDB</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Soft Skills</h2>
-    <ul>
-      <li>Strong communication and teamwork</li>
-      <li>Time management and adaptability</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Achievements</h2>
-    <ul>
-      <li>Top 5 Finalist in Inter-College Hackathon 2023</li>
-      <li>Runner-up in college tech quiz competition</li>
-    </ul>
-  </div>
-
-  <div style='margin-bottom: 16px;'>
-    <h2 style='background: #0a3d62; color: white; padding: 5px;'>Languages</h2>
-    <ul>
-      <li>English (Fluent)</li>
-      <li>Hindi (Native)</li>
-    </ul>
-  </div>
-
-</div>`}
+          // initialVvalue={initialTemplate4Content}
+          value={content}
           init={{
             height: 500,
-            menubar: false,
+            menubar: true,
             plugins: ["lists", "wordcount", "link", "preview"],
             toolbar:
               "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",

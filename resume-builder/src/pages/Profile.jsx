@@ -14,11 +14,13 @@ import { FaCrown } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
+import { getAllResumes } from "../utils/utils";
 
 export default function Profile() {
   const [user, setUser] = useState();
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
+  const [resumes,setResumes] = useState([]);
   const resumeHistory = [
     {
       id: 1,
@@ -65,8 +67,29 @@ export default function Profile() {
     fetchSubscription();
   }, [user]);
 
+
+
+  useEffect(() => {
+    const fetchResumes = async () => {
+      if (user) {
+        try {
+          const resumes  = await getAllResumes(user?.email);
+          setResumes(resumes)
+          console.log(resumes,"resumes")
+        } catch (error) {
+          console.error("Error fetching resumes", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchResumes();
+  }, [user]);
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log(currentUser,"curr user")
       setUser(currentUser);
     });
     return () => unsubscribe();
@@ -178,7 +201,7 @@ export default function Profile() {
                       <div>
                         <p className="text-sm text-gray-400">Resumes Created</p>
                         <p className="font-medium text-gray-100">
-                          {resumeHistory.length}
+                          {resumes?.length || 0}
                         </p>
                       </div>
                     </div>
@@ -261,10 +284,10 @@ export default function Profile() {
                   </div>
                   <div className="p-6">
                     <div className="space-y-4">
-                      {resumeHistory &&
-                        resumeHistory.map((resume) => (
+                      {resumes &&
+                        resumes.map((resume,index) => (
                           <motion.div
-                            key={resume.id}
+                            key={index}
                             whileHover={{ scale: 1.01 }}
                             className="flex justify-between items-center p-4 border border-[#344054] rounded-lg hover:bg-[#344054] transition-colors"
                           >
@@ -273,17 +296,31 @@ export default function Profile() {
                                 {resume.title}
                               </h4>
                               <p className="text-sm text-gray-400">
-                                {resume.createdAt}
+                                {resume.lastModified.toDate().toLocaleDateString()}
                               </p>
                             </div>
-                            <motion.a
+
+                            <div className="flex gap-2 justify-center items-center">
+                            {/* <motion.a
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              href={resume.downloadUrl}
+                              // href={resume.downloadUrl}
                               className="text-[#101828] bg-[#00CFC6] hover:bg-[#00e0d6] px-4 py-2 rounded-lg font-medium transition-colors"
                             >
                               Download
+                            </motion.a> */}
+
+                            <motion.a
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              href={`/template${resume.template}`}
+                              className="text-[#101828] bg-[#00CFC6] hover:bg-[#00e0d6] px-4 py-2 rounded-lg font-medium transition-colors"
+                            >
+                              Edit
                             </motion.a>
+                            </div>
+                          
+
                           </motion.div>
                         ))}
                     </div>

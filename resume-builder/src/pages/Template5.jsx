@@ -1,17 +1,20 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import { initialTemplate5 } from "../utils/templateContent";
+import { getResume, storeResume } from "../utils/utils";
+import toast from "react-hot-toast"
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
   const editorRef = useRef(null);
+  const [templateNumber] = useState("5");
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
   };
 
-  const downloadPDF = () => {
+  const downloadPDF = async() => {
     const element = document.getElementById("resume-preview");
     html2canvas(element, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
@@ -35,8 +38,46 @@ export default function ResumeEditor() {
       }
 
       pdf.save("resume.pdf");
+
+      
     });
+
+
+    await storeResume( templateNumber, content);
   };
+
+
+
+
+    useEffect(() => {
+      (async function () {
+        try {
+          const content = await getResume(templateNumber);
+          if(!content){
+            setContent(initialTemplate5)
+          }else{
+            setContent(content);
+          }
+          
+        } catch (error) {
+          setContent(initialTemplate5)
+          console.log(error);
+        }
+      })();
+    }, []);
+  
+  
+  
+  
+    const saveResumeContent = async () => {
+      try {
+        await storeResume(templateNumber, content);
+        toast.success("Resume is saved");
+      } catch (error) {
+        toast.error("something wen wrong, please try again");
+        console.log(error);
+      }
+    };
 
   return (
     <div className="container mx-auto p-6 flex flex-col items-center">
@@ -46,55 +87,46 @@ export default function ResumeEditor() {
       </div>
 
       <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
+        <div className=" flex justify-between items-center mb-3">
+          <button
+            onClick={downloadPDF}
+            className=" px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          >
+            Download as PDF
+          </button>
+          <button
+            onClick={saveResumeContent}
+            className="w-[120px] h-[40px] bg-[#071a41] hover:bg-[#2b3955] text-white-400 font-semibold rounded-4xl cursor-pointer  items-end "
+          >
+            Save
+          </button>
+        </div>
+
         <Editor
           apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-          initialValue={`<h1 style='text-align:center; font-size:24px; font-weight:bold; margin-bottom:10px;'>Medhavi Rampal</h1>
-<p style='text-align:center; font-size:14px; margin-bottom:5px;'>Phone: +91 8882376779 | Email: medha8183@gmail.com</p>
-<p style='text-align:center; font-size:14px; margin-bottom:10px;'>LinkedIn: linkedin.com/in/medhavi-rampal | GitHub: github.com/medhavi</p>
-
-<h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>PROFESSIONAL SUMMARY</h2>
-<p style='margin-bottom:15px;'>Results-driven Full Stack Developer with 4+ years of experience in designing, developing, and deploying scalable web and mobile applications. Proficient in React, Node.js, Firebase, and Android Studio.</p>
-
-<h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>WORK EXPERIENCE</h2>
-<h3 style='font-size:16px; font-weight:bold; margin-bottom:5px;'>Senior Software Developer – ABC Tech Solutions</h3>
-<p style='margin-bottom:5px;'>July 2021 – Present | New Delhi, India</p>
-<ul style='margin-bottom:15px; list-style-type: disc; padding-left: 20px;'>
-  <li>Led a team of 5 developers to deliver a scalable appointment booking system used by over 50,000 users.</li>
-  <li>Architected backend APIs using Node.js and Express, reducing response times by 40%.</li>
-</ul>
-
-<h3 style='font-size:16px; font-weight:bold; margin-bottom:5px;'>Software Developer – XYZ Solutions</h3>
-<p style='margin-bottom:5px;'>Jan 2019 – June 2021 | Gurgaon, India</p>
-<ul style='margin-bottom:15px; list-style-type: disc; padding-left: 20px;'>
-  <li>Developed RESTful APIs and admin dashboards for fintech applications using MERN stack.</li>
-  <li>Worked closely with QA teams to automate unit and integration tests using Jest and Cypress.</li>
-</ul>
-
-<h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>PROJECTS</h2>
-<h3 style='font-size:16px; font-weight:bold; margin-bottom:5px;'>AppointLix – Appointment Booking System</h3>
-<p style='margin-bottom:5px;'>Technologies: React, Node.js, MongoDB, Cloudinary</p>
-<ul style='margin-bottom:15px; list-style-type: disc; padding-left: 20px;'>
-  <li>Developed a secure, scalable appointment system with role-based access for doctors and patients.</li>
-</ul>
-
-<h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>TECHNICAL SKILLS</h2>
-<ul style='margin-bottom:15px; list-style-type: disc; padding-left: 20px;'>
-  <li><strong>Languages:</strong> JavaScript, TypeScript, Java, C++, Python</li>
-  <li><strong>Frameworks:</strong> React, Node.js, Express, Spring Boot</li>
-  <li><strong>Database:</strong> MongoDB, PostgreSQL, MySQL, Firebase</li>
-</ul>
-
-
-
-<h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>EDUCATION</h2>
-<h3 style='font-size:16px; font-weight:bold; margin-bottom:5px;'>Bachelor of Computer Applications</h3>
-<p style='margin-bottom:15px;'>Guru Gobind Singh Indraprastha University, 2022 | CGPA: 9.12</p>`}
+          // initialVvalue={initialTemplate4Content}
+          value={content}
           init={{
-            height: 400,
+            height: 500,
             menubar: true,
-            plugins: ["lists", "wordcount", "link", "code", "preview"],
+            plugins: ["lists", "wordcount", "link", "preview"],
             toolbar:
               "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
+            content_style: `
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                color: #2c3e50;
+                line-height: 1.7;
+              }
+              h2 {
+                margin-top: 24px;
+                margin-bottom: 10px;
+              }
+              p, ul {
+                margin-bottom: 16px;
+              }
+            `,
           }}
           onEditorChange={handleEditorChange}
           ref={editorRef}

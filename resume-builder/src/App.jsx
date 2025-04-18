@@ -24,6 +24,7 @@ import Template9 from "./pages/Template9";
 import Template10 from "./pages/Template10";
 import Success from "./components/Success";
 import Profile from "./pages/Profile";
+import  {Toaster} from "react-hot-toast"
 const App = () => {
   return (
     <Router>
@@ -58,6 +59,7 @@ const App = () => {
         </Routes>
 
         <Footer />
+        <Toaster/>
       </div>
     </Router>
   );

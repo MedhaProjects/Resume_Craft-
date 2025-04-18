@@ -1,11 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import { getResume, storeResume } from "../utils/utils";
+import { initialTemplate3Content } from "../utils/templateContent";
+import toast from "react-hot-toast";
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
   const editorRef = useRef(null);
+  const [templateNumber] = useState("3");
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
@@ -39,99 +42,85 @@ export default function ResumeEditor() {
       pdf.save("resume.pdf");
     });
 
-    await storeResume( "3", content);
+    await storeResume( templateNumber, content);
   };
+
+
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const content = await getResume(templateNumber);
+        if(!content){
+          setContent(initialTemplate3Content)
+        }else{
+          setContent(content);
+        }
+        
+      } catch (error) {
+        setContent(initialTemplate3Content)
+        console.log(error);
+      }
+    })();
+  }, []);
+
+
+
+
+  const saveResumeContent = async () => {
+    try {
+      await storeResume(templateNumber, content);
+      toast.success("Resume is saved");
+    } catch (error) {
+      toast.error("something wen wrong, please try again");
+      console.log(error);
+    }
+  };
+
+
 
   return (
     <div className="container mx-auto p-6 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-center mb-4 text-indigo-800">Resume Editor</h1>
 
       <div className="border rounded-lg p-6 shadow-lg bg-white w-full max-w-3xl">
-        <Editor
+      <div className=" flex justify-between items-center mb-3">
+          <button
+            onClick={downloadPDF}
+            className=" px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          >
+            Download as PDF
+          </button>
+          <button
+            onClick={saveResumeContent}
+            className="w-[120px] h-[40px] bg-[#071a41] hover:bg-[#2b3955] text-white-400 font-semibold rounded-4xl cursor-pointer  items-end "
+          >
+            Save
+          </button>
+        </div>
+
+ <Editor
           apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
-          initialValue={`<div style='font-family: Arial, sans-serif; color: #2c3e50; font-size: 14px;'>
-  <h1 style='text-align:center; font-size:26px; font-weight:bold; color: #4b0082;'>JOHN DOE</h1>
-  <p style='text-align:center;'>123, Model Town, Delhi | +91-9999999999 | john.doe@email.com | linkedin.com/in/johndoe</p>
-  <hr style='border-top: 2px solid #4b0082; margin: 16px 0;' />
-
-  <h2 style='color: #4b0082;'>OBJECTIVE</h2>
-  <p>Self-motivated and detail-oriented Computer Applications graduate, seeking to launch a professional career in software development. Passionate about front-end technologies, problem-solving, and continuously enhancing technical skills to deliver impactful digital solutions.</p>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>EDUCATION</h2>
-  <strong>Bachelor of Computer Applications (BCA)</strong>
-  <p>Mata Sundri College, Delhi University | 2022 – 2025 | CGPA: 8.7</p>
-  <ul>
-    <li><strong>Key Subjects:</strong> Data Structures, Operating Systems, Web Development, Software Engineering</li>
-    <li><strong>Academic Projects:</strong> Attendance Management System, Portfolio Website</li>
-  </ul>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>INTERNSHIPS</h2>
-  <strong>Frontend Developer Intern – ABC Tech Solutions</strong><span style='float:right;'>Jan 2024 – Mar 2024</span>
-  <ul>
-    <li>Collaborated on building responsive web interfaces using React and Tailwind CSS.</li>
-    <li>Worked with RESTful APIs and state management using Redux Toolkit.</li>
-  </ul>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>PROJECTS</h2>
-  <strong>Resume Builder App</strong><br/>
-  <ul>
-    <li>Built a dynamic resume builder using React.js, TinyMCE, and jsPDF.</li>
-    <li>Integrated HTML-to-PDF functionality and ensured ATS-friendly structure.</li>
-  </ul>
-
-  <strong>Personal Portfolio</strong><br/>
-  <ul>
-    <li>Designed a mobile-responsive personal website to showcase my skills and projects.</li>
-    <li>Deployed on GitHub Pages and optimized for performance and SEO.</li>
-  </ul>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>TECHNICAL SKILLS</h2>
-  <ul>
-    <li><strong>Languages:</strong> C, C++, JavaScript, Python</li>
-    <li><strong>Frontend:</strong> HTML, CSS, Bootstrap, React.js, Tailwind</li>
-    <li><strong>Backend:</strong> Node.js (Basics), Express.js</li>
-    <li><strong>Databases:</strong> MySQL, Firebase, MongoDB (Basics)</li>
-    <li><strong>Tools:</strong> Git, GitHub, VS Code, Postman</li>
-  </ul>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>CERTIFICATIONS</h2>
-  <ul>
-    <li>Full-Stack Web Development with React – Coursera</li>
-    <li>JavaScript Essentials – HackerRank</li>
-    <li>Firebase for Web Developers – Google Developers</li>
-  </ul>
-  <br/><hr />
-
-  <h2 style='color: #4b0082;'>ACHIEVEMENTS</h2>
-  <ul>
-    <li>Top 5 in University Hackathon 2023 (Built a Smart Scheduler App)</li>
-    <li>Received “Star Intern” recognition at ABC Tech Solutions</li>
-  </ul>
-</div>`}
+          // initialVvalue={initialTemplate4Content}
+          value={content}
           init={{
             height: 500,
-            menubar: false,
-            plugins: ["lists", "wordcount", "link"],
+            menubar: true,
+            plugins: ["lists", "wordcount", "link", "preview"],
             toolbar:
-              "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link",
+              "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
             content_style: `
               body {
                 font-family: Arial, sans-serif;
                 font-size: 14px;
                 color: #2c3e50;
+                line-height: 1.7;
               }
               h2 {
-                font-size: 18px;
-                color: #4b0082;
                 margin-top: 24px;
-                font-weight: bold;
+                margin-bottom: 10px;
               }
-              ul {
+              p, ul {
                 margin-bottom: 16px;
               }
             `,
