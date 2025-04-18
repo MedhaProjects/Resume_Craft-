@@ -306,4 +306,6 @@ export const initialTemplate5 = `<h1 style='text-align:center; font-size:24px; f
 
 <h2 style='font-size:18px; font-weight:bold; margin-bottom:10px; border-bottom:2px solid #000; padding-bottom:5px;'>EDUCATION</h2>
 <h3 style='font-size:16px; font-weight:bold; margin-bottom:5px;'>Bachelor of Computer Applications</h3>
-<p style='margin-bottom:15px;'>Guru Gobind Singh Indraprastha University, 2022 | CGPA: 9.12</p>`
+<p style='margin-bottom:15px;'>Guru Gobind Singh Indraprastha University, 2022 | CGPA: 9.12</p>`;
+
+
