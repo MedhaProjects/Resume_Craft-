@@ -30,7 +30,7 @@ const Checker = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5000/analyze-resume", {
+      const response = await fetch("https://hariom-major-project.onrender.com/analyze-resume", {
         method: "POST",
         body: formData,
       });
