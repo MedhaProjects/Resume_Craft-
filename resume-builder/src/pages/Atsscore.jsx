@@ -192,15 +192,15 @@ const Checker = () => {
               <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-gray-900/50 rounded-xl p-6">
                 <div className="w-48 h-48">
                   <CircularProgressbar
-                    value={data.ats_score}
-                    text={`${data.ats_score}%`}
+                    value={data?.ats_score}
+                    text={`${data?.ats_score}%`}
                     styles={buildStyles({
                       textSize: "16px",
                       textColor: "#fff",
                       pathColor:
-                        data.ats_score > 75
+                        data?.ats_score > 75
                           ? "#4CAF50"
-                          : data.ats_score > 50
+                          : data?.ats_score > 50
                           ? "#FFC107"
                           : "#FF5722",
                       trailColor: "#2D3748",
@@ -212,22 +212,22 @@ const Checker = () => {
                     ATS Compatibility Score
                   </h3>
                   <p className="text-gray-300 mb-4">
-                    {data.ats_score > 75
+                    {data?.ats_score > 75
                       ? "Your resume shows strong compatibility with most ATS systems. Keep up the good work!"
-                      : data.ats_score > 50
+                      : data?.ats_score > 50
                       ? "Your resume has moderate ATS compatibility. There's room for improvement in several areas."
                       : "Your resume may have difficulty passing through ATS filters. Consider making some key improvements."}
                   </p>
                   <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${
-                        data.ats_score > 75
+                        data?.ats_score > 75
                           ? "bg-green-500"
-                          : data.ats_score > 50
+                          : data?.ats_score > 50
                           ? "bg-yellow-500"
                           : "bg-red-500"
                       }`}
-                      style={{ width: `${data.ats_score}%` }}
+                      style={{ width: `${data?.ats_score}%` }}
                     ></div>
                   </div>
                 </div>
