@@ -53,7 +53,6 @@ export const storeResume = async (template, content) => {
       }
     );
 
-    console.log("Resume saved successfully");
     return true;
   } catch (error) {
     console.error("Error saving resume:", error);

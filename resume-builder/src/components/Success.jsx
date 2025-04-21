@@ -36,7 +36,7 @@ const Success = () => {
           age: new Date().setDate(new Date().getDate() + age),
           title: title,
         });
-        console.log("Checkout session info saved to Firestore.");
+    
       } catch (error) {
         console.error("Error saving to Firestore:", error);
       } finally {

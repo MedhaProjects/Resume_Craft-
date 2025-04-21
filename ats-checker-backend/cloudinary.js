@@ -1,10 +1,11 @@
-import { v2 as cloudinary } from "cloudinary";
-cloudinary.config({
+
+const v2= require("cloudinary")
+v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
-export async function uploadResume(file, email) {
+async function uploadResume(file, email) {
   try {
     if (!file) {
       throw new Error("No file uploaded.");
@@ -39,3 +40,4 @@ export async function uploadResume(file, email) {
     return null;
   }
 }
+module.exports= uploadResume;

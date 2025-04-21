@@ -21,26 +21,6 @@ export default function Profile() {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [resumes,setResumes] = useState([]);
-  const resumeHistory = [
-    {
-      id: 1,
-      title: "Software Engineer Resume",
-      createdAt: "April 10, 2025",
-      downloadUrl: "#",
-    },
-    {
-      id: 2,
-      title: "Cybersecurity Specialist",
-      createdAt: "March 28, 2025",
-      downloadUrl: "#",
-    },
-    {
-      id: 3,
-      title: "Web Developer",
-      createdAt: "March 15, 2025",
-      downloadUrl: "#",
-    },
-  ];
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -51,7 +31,7 @@ export default function Profile() {
           const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
             const data = docSnap.data();
-            console.log("Subscription Data:", data);
+    
             setData(data);
           } else {
             console.log("No subscription found.");
@@ -75,7 +55,7 @@ export default function Profile() {
         try {
           const resumes  = await getAllResumes(user?.email);
           setResumes(resumes)
-          console.log(resumes,"resumes")
+       
         } catch (error) {
           console.error("Error fetching resumes", error);
         } finally {
@@ -89,7 +69,7 @@ export default function Profile() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log(currentUser,"curr user")
+ 
       setUser(currentUser);
     });
     return () => unsubscribe();

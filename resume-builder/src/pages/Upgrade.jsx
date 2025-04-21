@@ -102,7 +102,6 @@ const Upgrade = () => {
         console.error("Stripe Checkout Error:", error);
         alert("Failed to redirect to checkout.");
       }
-      // console.log(age,title,priceId,"check")
       localStorage.setItem("firebaseTitle",title);
       localStorage.setItem("firebasePriceId",priceId);
       localStorage.setItem("firebaseAge",age);
