@@ -230,6 +230,7 @@ const Checker = () => {
                           ? "bg-yellow-500"
                           : "bg-red-500"
                       }`}
+                      
                       style={{ width: `${data?.ats_score}%` }}
                     ></div>
                   </div>
