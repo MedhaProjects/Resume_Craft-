@@ -36,7 +36,10 @@ const Checker = () => {
       });
 
       const json = await response.json();
-      setData(json);
+      if(json.result){
+        setData(json.result);
+      }
+     
     } catch (error) {
       console.error("Error analyzing resume:", error);
     } finally {
@@ -175,7 +178,7 @@ const Checker = () => {
         )}
 
         {/* Results Section */}
-        {data && (
+        {!loading && data && (
           <div className="bg-gray-800/70 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-gray-700 mb-10">
             {/* Score Header */}
             <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6">
@@ -486,12 +489,16 @@ const InfoSection = ({
       <h3 className="text-lg font-semibold">{title}</h3>
     </div>
     <ul className="space-y-2">
-      {list.map((item, i) => (
-        <li key={i} className="flex items-start">
-          <span className="text-gray-300 mr-2">•</span>
-          <span className="text-gray-300">{item}</span>
-        </li>
-      ))}
+      {list && list.length > 0 ? (
+        list.map((item, i) => (
+          <li key={i} className="flex items-start">
+            <span className="text-gray-300 mr-2">•</span>
+            <span className="text-gray-300">{item}</span>
+          </li>
+        ))
+      ) : (
+        <li className="text-gray-400">No {title.toLowerCase()} found</li>
+      )}
     </ul>
   </div>
 );
