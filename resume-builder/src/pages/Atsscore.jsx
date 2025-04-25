@@ -36,6 +36,7 @@ const Checker = () => {
       });
 
       const json = await response.json();
+      console.log(json,"resume daata");
       if(json.result){
         setData(json.result);
       }
@@ -230,7 +231,6 @@ const Checker = () => {
                           ? "bg-yellow-500"
                           : "bg-red-500"
                       }`}
-                      
                       style={{ width: `${data?.ats_score}%` }}
                     ></div>
                   </div>
@@ -238,7 +238,7 @@ const Checker = () => {
               </div>
 
               {/* Premium Upsell or Analysis Sections */}
-              {!isPremium ? (
+              {isPremium ? (
                 <div className="relative">
                   <div className="blur-sm pointer-events-none">
                     <AnalysisSections data={data} />
