@@ -41,7 +41,7 @@ const App = () => {
           <Route path="/upgrade" element={<Upgrade />} />
           <Route path="/resume-types" element={<ResumeTypes />} />
           <Route path="/ats" element={<Ats />} />
-          <Route path="/edit/:type" element={<ResumeEditor />} />
+         
           <Route path="/build-resume" element={<BuildResume />} />
           <Route path="/success" element={<Success />} />
           <Route path="/profile" element={<Profile />} />
@@ -56,6 +56,7 @@ const App = () => {
           <Route path="/template8" element={<Template8 />} />
           <Route path="/template9" element={<Template9 />} />
           <Route path="/template10" element={<Template10 />} />
+          <Route path="/edit/:type" element={<ResumeEditor />} />
         </Routes>
 
         <Footer />
