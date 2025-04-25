@@ -20,7 +20,9 @@ const upload = multer({
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin:["http://localhost:5174","http://localhost:5173","https://resume-craft-sand.vercel.app"]
+}));
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
