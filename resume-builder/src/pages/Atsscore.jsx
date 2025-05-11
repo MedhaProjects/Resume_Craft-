@@ -36,7 +36,7 @@ const Checker = () => {
       });
 
       const json = await response.json();
-      console.log(json,"resume daata");
+  
       if(json.result){
         setData(json.result);
       }
@@ -74,7 +74,10 @@ const Checker = () => {
     return () => unsubscribe();
   }, []);
 
-  const isPremium = subData?.status === "active";
+  
+
+  const isPremium = subData?.status === "successful";
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-6 md:p-10">
@@ -238,7 +241,7 @@ const Checker = () => {
               </div>
 
               {/* Premium Upsell or Analysis Sections */}
-              {isPremium ? (
+              {!isPremium ? (
                 <div className="relative">
                   <div className="blur-sm pointer-events-none">
                     <AnalysisSections data={data} />
