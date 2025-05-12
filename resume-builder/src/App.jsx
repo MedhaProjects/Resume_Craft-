@@ -22,6 +22,10 @@ import Template7 from "./pages/Template7";
 import Template8 from "./pages/Template8";
 import Template9 from "./pages/Template9";
 import Template10 from "./pages/Template10";
+import Template11 from "./pages/Template11";
+import Template12 from "./pages/Template12";
+import Template13 from "./pages/Template13";
+
 import Success from "./components/Success";
 import Profile from "./pages/Profile";
 import  {Toaster} from "react-hot-toast"
@@ -56,6 +60,10 @@ const App = () => {
           <Route path="/template8" element={<Template8 />} />
           <Route path="/template9" element={<Template9 />} />
           <Route path="/template10" element={<Template10 />} />
+          <Route path="/template11" element={<Template11 />} />
+          <Route path="/template12" element={<Template12 />} />
+          <Route path="/template13" element={<Template13 />} />
+
           <Route path="/edit/:type" element={<ResumeEditor />} />
         </Routes>
 
