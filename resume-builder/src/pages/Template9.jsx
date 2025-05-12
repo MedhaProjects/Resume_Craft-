@@ -1,318 +1,166 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { initialTemplate5 } from "../utils/templateContent";
+import { getResume, storeResume } from "../utils/utils";
+import toast from "react-hot-toast";
 
-const ResumeTemplate = () => {
-  const [data, setData] = useState({
-    name: "DANIEL GALLEGO",
-    title: "UX DESIGNER",
-    contact: "123 Anywhere St, Any City | hello@reallygreatsite.com | www.reallygreatsite.com",
-    summary:
-      "UX Designer with a focus on delivering impactful results, eager to tackle dynamic challenges and apply creativity to craft intuitive user experiences. Demonstrated proficiency in project management, user-centric problem-solving, and seamless collaboration across teams. Skilled in leveraging state-of-the-art tools and methodologies to streamline processes and elevate user satisfaction.",
-    skills: [
-      "Prototyping Tools", "Interaction Design", "Accessibility",
-      "User Research", "Visual Design", "Responsive Design",
-      "Information Architecture", "Usability Heuristics", "User Testing Tools"
-    ],
-    experience: [
-      {
-        company: "Instant Chartz App, Morcelle Program",
-        duration: "Jan 2023 - Present",
-        details: [
-          "Led development of an advanced automation system, achieving a 15% increase in operational efficiency.",
-          "Streamlined manufacturing processes, reducing production costs by 10%.",
-          "Implemented preventive maintenance strategies, resulting in a 20% decrease in equipment downtime."
-        ]
-      },
-      {
-        company: "System UX Engineer, XarrowAI Industries",
-        duration: "Feb 2021 - Dec 2022",
-        details: [
-          "Designed and optimized a robotic control system, realizing a 12% performance improvement.",
-          "Coordinated testing and validation, ensuring compliance with industry standards.",
-          "Provided technical expertise, contributing to a 15% reduction in system failures."
-        ]
+export default function ResumeEditor() {
+  const [content, setContent] = useState("");
+  const editorRef = useRef(null);
+  const [templateNumber] = useState("5");
+
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
+  };
+
+  const downloadPDF = async () => {
+    const element = document.getElementById("resume-preview");
+    html2canvas(element, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
-    ],
-    education: [
-      {
-        degree: "UX Industrial Basics and General Application",
-        institution: "University of Engineering UX Cohort",
-        year: "Aug 2016 - Oct 2019"
-      },
-      {
-        degree: "Bachelor of Design in Process Engineering",
-        institution: "Engineering University",
-        year: "May 2014 - May 2016"
+
+      pdf.save("resume.pdf");
+    });
+
+    await storeResume(templateNumber, content);
+  };
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const content = await getResume(templateNumber);
+        setContent(content || initialTemplate5);
+      } catch (error) {
+        setContent(initialTemplate5);
+        console.log(error);
       }
-    ],
-    additional: {
-      languages: "English, French, Mandarin",
-      certifications: "Professional Design Engineer (PDE) License, Project Management Tech (PMT)",
-      awards: "Most Innovative Employer of the Year (2021), Overall Best Employee Division Two (2024), Onboarding Project Lead (2023)"
+    })();
+  }, []);
+
+  useEffect(() => {
+    const resume = document.getElementById("resume-preview");
+    if (resume) {
+      const headings = resume.querySelectorAll("h2");
+      headings.forEach((el) => {
+        el.className =
+          "bg-gray-700 text-white px-4 py-2 rounded mt-6 mb-3 text-lg font-semibold";
+      });
+
+      const paragraphs = resume.querySelectorAll("p");
+      paragraphs.forEach((p) => {
+        p.className = "mb-4 text-sm text-gray-800";
+      });
+
+      const lists = resume.querySelectorAll("ul");
+      lists.forEach((ul) => {
+        ul.className = "list-disc pl-6 mb-4 text-sm text-gray-800";
+      });
+
+      const listItems = resume.querySelectorAll("ul li");
+      listItems.forEach((li) => {
+        li.classList.add("mb-2");
+      });
     }
-  });
+  }, [content]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleArrayChange = (e, field, index) => {
-    const { name, value } = e.target;
-    const updatedArray = [...data[field]];
-    updatedArray[index] = { ...updatedArray[index], [name]: value };
-    setData(prevData => ({
-      ...prevData,
-      [field]: updatedArray
-    }));
-  };
-
-  const handleClearField = (field) => {
-    setData(prevData => ({
-      ...prevData,
-      [field]: field === 'skills' ? [] : ''
-    }));
-  };
-
-  const handleClearArrayField = (field, index, key) => {
-    const updatedArray = [...data[field]];
-    updatedArray[index] = { ...updatedArray[index], [key]: '' };
-    setData(prevData => ({
-      ...prevData,
-      [field]: updatedArray
-    }));
+  const saveResumeContent = async () => {
+    try {
+      await storeResume(templateNumber, content);
+      toast.success("Resume is saved");
+    } catch (error) {
+      toast.error("Something went wrong, please try again");
+      console.log(error);
+    }
   };
 
   return (
-    <div className="flex space-x-4">
-      {/* Form Section */}
-      <div className="flex-1 text-black bg-white shadow-lg p-8 border rounded-lg font-sans">
-        <h2 className="text-2xl font-semibold">Edit Resume</h2>
-
-        {/* Name */}
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="name"
-            value={data.name}
-            onChange={handleChange}
-            placeholder="Full Name"
-            className="border p-2 w-full"
-          />
-          <button onClick={() => handleClearField('name')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-        </div>
-
-        {/* Title */}
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="title"
-            value={data.title}
-            onChange={handleChange}
-            placeholder="Job Title"
-            className="border p-2 w-full"
-          />
-          <button onClick={() => handleClearField('title')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-        </div>
-
-        {/* Contact Info */}
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="contact"
-            value={data.contact}
-            onChange={handleChange}
-            placeholder="Contact Info"
-            className="border p-2 w-full"
-          />
-          <button onClick={() => handleClearField('contact')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-        </div>
-
-        {/* Summary */}
-        <div className="flex items-center mb-2">
-          <textarea
-            name="summary"
-            value={data.summary}
-            onChange={handleChange}
-            placeholder="Summary"
-            className="border p-2 w-full"
-          />
-          <button onClick={() => handleClearField('summary')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-        </div>
-
-        {/* Skills */}
-        <div className="flex items-center mb-2">
-          <textarea
-            name="skills"
-            value={data.skills.join(", ")}
-            onChange={(e) => handleChange({ target: { name: "skills", value: e.target.value.split(", ") } })}
-            placeholder="Skills (comma separated)"
-            className="border p-2 w-full"
-          />
-          <button onClick={() => handleClearField('skills')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-        </div>
-
-        {/* Experience */}
-        {data.experience.map((exp, index) => (
-          <div key={index} className="mb-4">
-            <div className="flex items-center mb-2">
-              <input
-                type="text"
-                name="company"
-                value={exp.company}
-                onChange={(e) => handleArrayChange(e, "experience", index)}
-                placeholder="Company"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('experience', index, 'company')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="text"
-                name="duration"
-                value={exp.duration}
-                onChange={(e) => handleArrayChange(e, "experience", index)}
-                placeholder="Duration"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('experience', index, 'duration')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-            <div className="flex items-center mb-2">
-              <textarea
-                name="details"
-                value={exp.details.join(", ")}
-                onChange={(e) => handleArrayChange(e, "experience", index)}
-                placeholder="Experience Details (comma separated)"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('experience', index, 'details')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-          </div>
-        ))}
-
-        {/* Education */}
-        {data.education.map((edu, index) => (
-          <div key={index} className="mb-4">
-            <div className="flex items-center mb-2">
-              <input
-                type="text"
-                name="degree"
-                value={edu.degree}
-                onChange={(e) => handleArrayChange(e, "education", index)}
-                placeholder="Degree"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('education', index, 'degree')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="text"
-                name="institution"
-                value={edu.institution}
-                onChange={(e) => handleArrayChange(e, "education", index)}
-                placeholder="Institution"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('education', index, 'institution')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="text"
-                name="year"
-                value={edu.year}
-                onChange={(e) => handleArrayChange(e, "education", index)}
-                placeholder="Year"
-                className="border p-2 w-full"
-              />
-              <button onClick={() => handleClearArrayField('education', index, 'year')} className="ml-2 p-2 bg-red-500 text-white rounded">Clear</button>
-            </div>
-          </div>
-        ))}
-
-        {/* Additional Info - Editable Fields */}
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="languages"
-            value={data.additional.languages}
-            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, languages: e.target.value } } })}
-            placeholder="Languages"
-            className="border p-2 w-full"
-          />
-        </div>
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="certifications"
-            value={data.additional.certifications}
-            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, certifications: e.target.value } } })}
-            placeholder="Certifications"
-            className="border p-2 w-full"
-          />
-        </div>
-        <div className="flex items-center mb-2">
-          <input
-            type="text"
-            name="awards"
-            value={data.additional.awards}
-            onChange={(e) => handleChange({ target: { name: "additional", value: { ...data.additional, awards: e.target.value } } })}
-            placeholder="Awards"
-            className="border p-2 w-full"
-          />
-        </div>
+    <div className="container mx-auto p-6 flex flex-col items-center">
+      <div className="w-full flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold">Resume Editor</h2>
+        <div className="w-16"></div>
       </div>
 
-      {/* Preview Section */}
-      <div className="flex-1 bg-white text-black shadow-lg p-8 border rounded-lg font-sans" style={{ width: '8.27in', height: '11.69in', pageBreakAfter: 'always', border: '1px solid #000', padding: '2rem' }}>
-        <h1 className="text-3xl font-bold">{data.name}</h1>
-        <h2 className="text-lg font-semibold text-gray-600">{data.title}</h2>
-        <p className="text-gray-700 mt-2">{data.contact}</p>
-        <div className="mt-4 bg-gray-200 p-3 rounded-md">
-          <h3 className="font-semibold">SUMMARY</h3>
-          <p className="text-gray-700 text-sm">{data.summary}</p>
+      <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
+        <div className="flex justify-between items-center mb-3">
+          <button
+            onClick={downloadPDF}
+            className="px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          >
+            Download as PDF
+          </button>
+          <button
+            onClick={saveResumeContent}
+            className="w-[120px] h-[40px] bg-[#071a41] hover:bg-[#2b3955] text-white font-semibold rounded-lg cursor-pointer"
+          >
+            Save
+          </button>
         </div>
-        <div className="mt-4 bg-gray-200 p-3 rounded-md">
-          <h3 className="font-semibold">TECHNICAL SKILLS</h3>
-          <ul className="text-gray-700 text-sm grid grid-cols-3 gap-1">
-            {data.skills.map((skill, index) => (
-              <li key={index}>{skill}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="mt-4">
-          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">PROFESSIONAL EXPERIENCE</h3>
-          {data.experience.map((exp, index) => (
-            <div key={index} className="mt-2">
-              <h4 className="font-semibold">{exp.company}</h4>
-              <p className="text-gray-600 text-sm">{exp.duration}</p>
-              <ul className="list-disc list-inside text-gray-700 text-sm">
-                {exp.details.map((detail, i) => (
-                  <li key={i}>{detail}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4">
-          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">EDUCATION</h3>
-          {data.education.map((edu, index) => (
-            <div key={index} className="mt-2">
-              <h4 className="font-semibold">{edu.degree}</h4>
-              <p className="text-gray-600 text-sm">{edu.institution}, {edu.year}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4">
-          <h3 className="font-semibold bg-gray-200 p-3 rounded-md">ADDITIONAL</h3>
-          <p className="text-gray-700 text-sm">Languages: {data.additional.languages}</p>
-          <p className="text-gray-700 text-sm">Certifications: {data.additional.certifications}</p>
-          <p className="text-gray-700 text-sm">Awards: {data.additional.awards}</p>
-        </div>
+
+        <Editor
+          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+          value={content}
+          init={{
+            height: 500,
+            menubar: true,
+            plugins: ["lists", "wordcount", "link", "preview"],
+            toolbar:
+              "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
+            content_style: `
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                color: #2c3e50;
+                line-height: 1.7;
+              }
+              h2 {
+                margin-top: 24px;
+                margin-bottom: 10px;
+              }
+              p, ul {
+                margin-bottom: 16px;
+              }
+            `,
+          }}
+          onEditorChange={handleEditorChange}
+          ref={editorRef}
+        />
       </div>
+
+      <div
+        id="resume-preview"
+        className="mt-6 p-8 bg-white text-black shadow-xl border w-[210mm] min-h-[297mm] overflow-visible rounded-lg"
+        style={{
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </div>
+
+      <button
+        onClick={downloadPDF}
+        className="mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Download as PDF
+      </button>
     </div>
   );
-};
-
-export default ResumeTemplate;
+}
