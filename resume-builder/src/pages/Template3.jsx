@@ -81,7 +81,7 @@ export default function ResumeEditor() {
 
   return (
     <div className="container mx-auto p-6 flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-center mb-4 text-indigo-800">Resume Editor</h1>
+      <h1 className="text-4xl font-bold text-center mb-4 text-white-800">Resume Editor</h1>
 
       <div className="border rounded-lg p-6 shadow-lg bg-white w-full max-w-3xl">
       <div className=" flex justify-between items-center mb-3">
