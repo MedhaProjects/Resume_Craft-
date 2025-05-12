@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, ArrowRight, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -15,11 +15,26 @@ export default function BuildResumePage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Effect to simulate checking the steps after 2 seconds interval
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentStep((prevStep) => {
+        if (prevStep < steps.length - 1) {
+          return prevStep + 1;
+        }
+        clearInterval(timer); // Stop once all steps are completed
+        return prevStep;
+      });
+    }, 2000); // 2 seconds interval
+
+    return () => clearInterval(timer); // Cleanup on component unmount
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }} 
-        animate={{ opacity: 1, scale: 1 }} 
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-8 text-center relative"
       >
@@ -39,7 +54,9 @@ export default function BuildResumePage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.2 }}
-              className={`flex items-center gap-3 p-3 rounded-lg shadow-md transition-all ${index <= currentStep ? "bg-blue-100" : "bg-gray-200"}`}
+              className={`flex items-center gap-3 p-3 rounded-lg shadow-md transition-all ${
+                index <= currentStep ? "bg-blue-100" : "bg-gray-200"
+              }`}
             >
               {index <= currentStep ? (
                 <CheckCircle className="text-blue-600 w-6 h-6" />
