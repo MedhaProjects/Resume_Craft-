@@ -1,319 +1,166 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { initialTemplate5 } from "../utils/templateContent";
+import { getResume, storeResume } from "../utils/utils";
+import toast from "react-hot-toast";
 
-const ResumeTemplate = () => {
-  const [data, setData] = useState({
-    name: "",
-    title: "",
-    contact: "",
-    email: "",
-    summary: "",
-    skills: [""],
-    experience: [{ company: "", duration: "", details: "" }],
-    education: [{ degree: "", institution: "", year: "" }],
-    projects: "",
-    certificates: [""],
-    achievements: [""],
-    languages: [""],
-  });
+export default function ResumeEditor() {
+  const [content, setContent] = useState("");
+  const editorRef = useRef(null);
+  const [templateNumber] = useState("5");
 
-  // Handle simple input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+  const handleEditorChange = (newContent) => {
+    setContent(newContent);
   };
 
-  // Handle changes for array inputs
-  const handleArrayChange = (index, e, field) => {
-    const { value } = e.target;
-    const updatedArray = [...data[field]];
-    updatedArray[index] = value;
-    setData({ ...data, [field]: updatedArray });
+  const downloadPDF = async () => {
+    const element = document.getElementById("resume-preview");
+    html2canvas(element, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save("resume.pdf");
+    });
+
+    await storeResume(templateNumber, content);
   };
 
-  // Handle changes for array of objects inputs
-  const handleArrayObjectChange = (index, e, field, subfield) => {
-    const { value } = e.target;
-    const updatedArray = [...data[field]];
-    updatedArray[index] = { ...updatedArray[index], [subfield]: value };
-    setData({ ...data, [field]: updatedArray });
-  };
+  useEffect(() => {
+    (async function () {
+      try {
+        const content = await getResume(templateNumber);
+        setContent(content || initialTemplate5);
+      } catch (error) {
+        setContent(initialTemplate5);
+        console.log(error);
+      }
+    })();
+  }, []);
 
-  // Add new empty array field
-  const addArrayField = (field) => {
-    const newField =
-      field === "experience"
-        ? { company: "", duration: "", details: "" }
-        : field === "education"
-        ? { degree: "", institution: "", year: "" }
-        : field === "skills" || field === "achievements" || field === "languages"
-        ? ""
-        : "";
-    setData({ ...data, [field]: [...data[field], newField] });
-  };
+  useEffect(() => {
+    const resume = document.getElementById("resume-preview");
+    if (resume) {
+      const headings = resume.querySelectorAll("h2");
+      headings.forEach((el) => {
+        el.className =
+        "text-blue-900 mt-6 mb-3 text-lg font-semibold";
+      });
 
-  // Remove a field from an array
-  const removeArrayField = (field, index) => {
-    const updatedArray = [...data[field]];
-    updatedArray.splice(index, 1);
-    setData({ ...data, [field]: updatedArray });
+      const paragraphs = resume.querySelectorAll("p");
+      paragraphs.forEach((p) => {
+        p.className = "mb-4 text-sm text-gray-800";
+      });
+
+      const lists = resume.querySelectorAll("ul");
+      lists.forEach((ul) => {
+        ul.className = "list-disc pl-6 mb-4 text-sm text-gray-800";
+      });
+
+      const listItems = resume.querySelectorAll("ul li");
+      listItems.forEach((li) => {
+        li.classList.add("mb-2");
+      });
+    }
+  }, [content]);
+
+  const saveResumeContent = async () => {
+    try {
+      await storeResume(templateNumber, content);
+      toast.success("Resume is saved");
+    } catch (error) {
+      toast.error("Something went wrong, please try again");
+      console.log(error);
+    }
   };
 
   return (
-    <div className="flex space-x-8 p-8 bg-gray-100 min-h-screen justify-center">
-      {/* Input Section */}
-      <div className="w-1/2 bg-white text-black p-6 shadow-lg rounded-lg border border-gray-300">
-        <h2 className="text-xl font-bold mb-4 text-center">Enter Resume Details</h2>
+    <div className="container mx-auto p-6 flex flex-col items-center">
+      <div className="w-full flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold">Resume Editor</h2>
+        <div className="w-16"></div>
+      </div>
 
-        {/* Basic Info */}
-        {["name", "title", "contact", "email"].map((field) => (
-          <input
-            key={field}
-            name={field}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={data[field]}
-            onChange={handleChange}
-            className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        ))}
+      <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
+        <div className="flex justify-between items-center mb-3">
+          <button
+            onClick={downloadPDF}
+            className="px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+          >
+            Download as PDF
+          </button>
+          <button
+            onClick={saveResumeContent}
+            className="w-[120px] h-[40px] bg-[#071a41] hover:bg-[#2b3955] text-white font-semibold rounded-lg cursor-pointer"
+          >
+            Save
+          </button>
+        </div>
 
-        {/* Summary */}
-        <textarea
-          name="summary"
-          placeholder="Professional Summary"
-          value={data.summary}
-          onChange={handleChange}
-          className="w-full mb-4 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        <Editor
+          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+          value={content}
+          init={{
+            height: 500,
+            menubar: true,
+            plugins: ["lists", "wordcount", "link", "preview"],
+            toolbar:
+              "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
+            content_style: `
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                color: #2c3e50;
+                line-height: 1.7;
+              }
+              h2 {
+                margin-top: 24px;
+                margin-bottom: 10px;
+              }
+              p, ul {
+                margin-bottom: 16px;
+              }
+            `,
+          }}
+          onEditorChange={handleEditorChange}
+          ref={editorRef}
         />
-
-        {/* Experience Section */}
-        <h3 className="font-semibold mt-4 text-lg">Experience</h3>
-        {data.experience.map((exp, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["company", "duration", "details"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={exp[field]}
-                onChange={(e) =>
-                  handleArrayObjectChange(index, e, "experience", field)
-                }
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("experience", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("experience")}
-          className="bg-blue-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Experience
-        </button>
-
-        {/* Education Section */}
-        <h3 className="font-semibold mt-4 text-lg">Education</h3>
-        {data.education.map((edu, index) => (
-          <div
-            key={index}
-            className="mb-2 border border-gray-300 p-3 rounded-lg shadow-sm relative"
-          >
-            {["degree", "institution", "year"].map((field) => (
-              <input
-                key={field}
-                name={field}
-                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                value={edu[field]}
-                onChange={(e) =>
-                  handleArrayObjectChange(index, e, "education", field)
-                }
-                className="w-full mb-2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              />
-            ))}
-            <button
-              onClick={() => removeArrayField("education", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("education")}
-          className="bg-green-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Education
-        </button>
-
-        {/* Skills Section */}
-        <h3 className="font-semibold mt-4 text-lg">Skills</h3>
-        {data.skills.map((skill, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={skill}
-              onChange={(e) => handleArrayChange(index, e, "skills")}
-              placeholder="Skill"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={() => removeArrayField("skills", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("skills")}
-          className="bg-purple-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Skill
-        </button>
-
-        {/* Achievements Section */}
-        <h3 className="font-semibold mt-4 text-lg">Achievements</h3>
-        {data.achievements.map((achievement, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={achievement}
-              onChange={(e) => handleArrayChange(index, e, "achievements")}
-              placeholder="Achievement"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            <button
-              onClick={() => removeArrayField("achievements", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("achievements")}
-          className="bg-orange-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Achievement
-        </button>
-
-        {/* Languages Section */}
-        <h3 className="font-semibold mt-4 text-lg">Languages</h3>
-        {data.languages.map((language, index) => (
-          <div key={index} className="relative mb-2">
-            <input
-              value={language}
-              onChange={(e) => handleArrayChange(index, e, "languages")}
-              placeholder="Language"
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
-            <button
-              onClick={() => removeArrayField("languages", index)}
-              className="text-red-500 text-sm absolute top-2 right-2"
-            >
-              ✕ Remove
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addArrayField("languages")}
-          className="bg-teal-500 text-white px-4 py-1 rounded-full mt-2 w-full"
-        >
-          + Add Language
-        </button>
       </div>
 
-      {/* Resume Preview Section */}
       <div
-        className="w-1/2 bg-white text-black p-8 shadow-2xl rounded-3xl border border-gray-300"
-        style={{ maxWidth: "210mm", maxHeight: "297mm", margin: "0 auto", paddingBottom: "20px" }}
+        id="resume-preview"
+        className="mt-6 p-8 bg-white text-black shadow-xl border w-[210mm] min-h-[297mm] overflow-visible rounded-lg"
+        style={{
+          fontFamily: "Arial, sans-serif",
+        }}
       >
-        {/* Header */}
-        <div className="pb-4 mb-4 text-center border-b border-gray-200">
-          <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">
-            {data.name || "Rachelle Beaudry"}
-          </h1>
-          <p className="text-lg text-gray-600 mt-1">{data.title || "Accounting Executive"}</p>
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-            {data.contact || "123 Anywhere St, Any City"} <br />
-            <span className="text-blue-700">{data.email || "hello@realityestate.com"}</span>
-          </p>
-        </div>
-
-        {/* Summary */}
-        <div className="mb-6 bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="font-semibold text-lg text-blue-800 mb-3">Professional Summary</h3>
-          <p className="text-gray-700 leading-relaxed">
-            {data.summary ||
-              "Results-driven Accounting Executive with a proven record of optimizing financial performance. Expertise in strategic financial initiatives and team leadership. Seeking a challenging executive role to leverage analytical skills and drive organizational success."}
-          </p>
-        </div>
-
-        {/* Work Experience */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Work Experience</h3>
-          {data.experience.map((exp, index) => (
-            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-bold text-lg text-gray-800">{exp.company}</p>
-              <p className="text-sm text-gray-500">{exp.duration}</p>
-              <ul className="list-disc ml-5 text-gray-700 mt-2 space-y-1">
-                {exp.details.split("\n").map((line, i) => (
-                  <li key={i} className="text-sm">{line}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Skills */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Core Skills</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {data.skills.map((skill, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {skill || "Skill"}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Education */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Education</h3>
-          {data.education.map((edu, index) => (
-            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-semibold text-md text-gray-800">{edu.degree}</p>
-              <p className="text-sm text-gray-500">{edu.institution}</p>
-              <p className="text-gray-700 text-sm">{edu.year}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Achievements & Languages */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-lg text-blue-800 mb-4">Achievements & Languages</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {data.achievements.map((ach, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {ach || "Achievement"}
-              </p>
-            ))}
-            {data.languages.map((lang, index) => (
-              <p key={index} className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm border border-gray-200 shadow-sm">
-                {lang || "Language"}
-              </p>
-            ))}
-          </div>
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
       </div>
+
+      <button
+        onClick={downloadPDF}
+        className="mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Download as PDF
+      </button>
     </div>
   );
-};
-
-export default ResumeTemplate;
+}
