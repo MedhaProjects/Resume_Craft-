@@ -98,7 +98,7 @@ export default function ChatBot() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50">
               {!chatStarted ? (
                 <div className="h-full flex flex-col justify-center">
-                  <div className="text-center p-6">
+                  <div className="text-center p-6 ">
                     <Bot className="mx-auto mb-4 text-blue-500" size={40} />
                     <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
                       Welcome to ATS Assistant
@@ -178,7 +178,7 @@ export default function ChatBot() {
 
             {/* Input Area */}
             {chatStarted && (
-              <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
+              <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white text:black dark:bg-gray-800">
                 <div className="flex items-end gap-2">
                   <textarea
                     value={input}
@@ -186,6 +186,7 @@ export default function ChatBot() {
                     onKeyDown={handleKeyPress}
                     placeholder="Type your message..."
                     rows={1}
+                      style={{ color: 'black' }} 
                     className="flex-1 max-h-24 p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
                   <button
