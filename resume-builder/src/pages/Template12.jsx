@@ -2,80 +2,102 @@ import { useState, useRef, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { getResume, storeResume } from "../utils/utils";
 import toast from "react-hot-toast";
-import { initialTemplate2Content } from "../utils/templateContent";
+
+// 🔽 Initial Template 6 Content Based on Image
+const initialTemplate6Content = `
+<h1 style="font-size: 28px; font-weight: bold; text-transform: uppercase;">THOMAS BEASLEY</h1>
+<p style="margin: 4px 0;"><strong>Phone:</strong> (555) 123-4567 &nbsp;|&nbsp; <strong>Address:</strong> 3665 McLaughlin Street, Seattle, WA 98293 &nbsp;|&nbsp; <strong>Email:</strong> your-name@email.com</p>
+
+<h2 style="background-color: #8B0000; color: white; padding: 4px; font-size: 16px; margin-top: 20px;">SUMMARY</h2>
+<p>Passionate Technology Assistant skilled at troubleshooting and repairing digital devices. Excellent people skills from managing the tech support desk at Seattle Community Center. Looking to secure an entry-level position in retail where I can utilize my strong customer service skills and technical knowledge to enhance the customer experience and contribute positively to the team at [Company Name].</p>
+
+<h2 style="background-color: #8B0000; color: white; padding: 4px; font-size: 16px; margin-top: 20px;">EDUCATION</h2>
+<p><strong>Bachelor’s Degree in Business Administration</strong><br>
+May 20XX | Spokane University | Spokane, WA<br>
+GPA: 3.7/4.0</p>
+<p><strong>Relevant Coursework:</strong> Implementation of Contemporary Business Practices<br>
+<strong>Dissertation Title:</strong> Federal & State Business Law & Regulations, Introduction to HR Theory & Practices, Company Diversity and Inclusion, Introduction to Employer Contract Law</p>
+
+<h2 style="background-color: #8B0000; color: white; padding: 4px; font-size: 16px; margin-top: 20px;">EXPERIENCE</h2>
+<p><strong>Volunteer Technology Assistant</strong><br>
+May 20XX | Seattle Community Center | Seattle, WA</p>
+<ul style="margin-left: 20px;">
+  <li>Set up and repair technology devices for community members</li>
+  <li>Manage service queues, ensuring community members receive timely updates on service status</li>
+  <li>Engage with diverse clients to understand technology issues</li>
+  <li>Document detailed notes and estimate completion times</li>
+  <li>Collaborate closely with team members to maintain workflow and enhance service delivery</li>
+</ul>
+
+<h2 style="background-color: #8B0000; color: white; padding: 4px; font-size: 16px; margin-top: 20px;">KEY SKILLS</h2>
+<ul style="columns: 2; margin-left: 20px;">
+  <li>Customer service</li>
+  <li>Team collaboration</li>
+  <li>Troubleshooting</li>
+  <li>Multitasking</li>
+  <li>Organizing and scheduling</li>
+  <li>Time management</li>
+
+</ul>
+
+<h2 style="background-color: #8B0000; color: white; padding: 4px; font-size: 16px; margin-top: 20px;">HOBBIES & INTERESTS</h2>
+<ul style="margin-left: 20px;">
+  <li><strong>Coding:</strong> Recently completed a Python bootcamp</li>
+  <li><strong>Digital art:</strong> Create unique illustrations using Adobe Fresco</li>
+  <li><strong>Soccer:</strong> Play for a local team</li>
+</ul>
+`;
 
 export default function ResumeEditor() {
   const [content, setContent] = useState("");
-  const [templateNumber] = useState("2");
   const editorRef = useRef(null);
-  const [user, setUser] = useState();
+  const [templateNumber] = useState("6");
 
   const handleEditorChange = (newContent) => {
     setContent(newContent);
   };
 
   const downloadPDF = async () => {
-    try {
-      const element = document.getElementById("resume-preview");
-      const originalStyle = element.getAttribute("style");
+    const element = document.getElementById("resume-preview");
+    html2canvas(element, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
 
-      element.style.width = "794px";
-      element.style.minHeight = "1123px";
-      element.style.padding = "40px";
-      element.style.backgroundColor = "#ffffff";
-      element.style.color = "#2c3e50";
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
 
-      html2canvas(element, { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
 
-        const pdf = new jsPDF("p", "mm", "a4");
-        let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
+      }
 
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-        pdf.save("resume.pdf");
-        element.setAttribute("style", originalStyle || "");
-      });
-
-      await storeResume("2", content);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      pdf.save("resume.pdf");
     });
-    return () => unsubscribe();
-  }, []);
+
+    await storeResume(templateNumber, content);
+  };
 
   useEffect(() => {
     (async function () {
       try {
         const content = await getResume(templateNumber);
         if (!content) {
-          setContent(initialTemplate2Content);
+          setContent(initialTemplate6Content);
         } else {
           setContent(content);
         }
       } catch (error) {
-        setContent(initialTemplate2Content);
+        setContent(initialTemplate6Content);
         console.log(error);
       }
     })();
@@ -99,6 +121,7 @@ export default function ResumeEditor() {
         <div className="w-16"></div>
       </div>
 
+      {/* Resume Editor */}
       <div className="border rounded-lg p-6 shadow-md bg-white w-full max-w-3xl">
         <div className="flex justify-between items-center mb-3">
           <button
@@ -119,101 +142,34 @@ export default function ResumeEditor() {
           apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
           value={content}
           init={{
-            height: 500,
+            height: 400,
             menubar: true,
-            plugins: ["lists", "wordcount", "link", "preview"],
+            plugins: ["lists", "wordcount", "link", "code", "preview"],
             toolbar:
               "undo redo | formatselect | bold italic underline | alignleft aligncenter alignright | numlist bullist | link | removeformat",
-            content_style: `
-              body {
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-                color: #2c3e50;
-                line-height: 1.7;
-              }
-              h2 {
-                margin-top: 24px;
-                margin-bottom: 10px;
-              }
-              p, ul {
-                margin-bottom: 16px;
-              }
-              ul {
-                list-style-type: disc;
-                padding-left: 30px;
-              }
-            `,
           }}
           onEditorChange={handleEditorChange}
           ref={editorRef}
         />
       </div>
 
+      {/* Resume Preview */}
       <div
         id="resume-preview"
-        className="mt-6 bg-white text-black shadow-xl border-4 border-blue-900 w-[794px] min-h-[1123px] p-[40px] rounded-lg"
+        className="mt-6 p-8 bg-white text-black shadow-xl border w-[210mm] min-h-[297mm] overflow-hidden rounded-lg"
         style={{
           fontFamily: "Arial, sans-serif",
-          fontSize: "14px",
           lineHeight: "1.7",
-          overflow: "hidden",
-          backgroundColor: "#f7f9fc",
           color: "#2c3e50",
         }}
       >
-        {/* Custom Preview Styling */}
-        <style>
-          {`
-            #resume-preview * {
-              background-color: #ffffff !important;
-            }
-
-            #resume-preview {
-              color: #2c3e50 !important;
-            }
-
-            #resume-preview h2 {
-              margin-top: 24px;
-              margin-bottom: 12px;
-              padding: 12px 16px;
-              background-color: #e6f4ff !important;
-              border: 4px solid #004080;
-              border-radius: 8px;
-              color: #002244 !important;
-              font-weight: bold;
-            }
-
-            #resume-preview p {
-              background-color: #ffffff !important;
-              padding: 6px 10px;
-              margin-bottom: 12px;
-              border-left: 4px solid #4682b4;
-              color: #2c3e50 !important;
-            }
-
-            #resume-preview ul {
-              background-color: #ffffff !important;
-              padding-left: 24px;
-              margin-bottom: 12px;
-            }
-
-            #resume-preview li {
-              margin-bottom: 8px;
-              color: #2c3e50 !important;
-            }
-          `}
-        </style>
-
-        <div
-          dangerouslySetInnerHTML={{
-            __html: content,
-          }}
-        />
+        <div dangerouslySetInnerHTML={{ __html: content }} />
       </div>
 
+      {/* Download Button */}
       <button
         onClick={downloadPDF}
-        className="mt-6 px-5 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition"
+        className="mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
       >
         Download as PDF
       </button>
