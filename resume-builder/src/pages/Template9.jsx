@@ -150,6 +150,7 @@ export default function ResumeEditor() {
         className="mt-6 p-8 bg-white text-black shadow-xl border w-[210mm] min-h-[297mm] overflow-visible rounded-lg"
         style={{
           fontFamily: "Arial, sans-serif",
+           bg:"white",
         }}
       >
         <div dangerouslySetInnerHTML={{ __html: content }} />
