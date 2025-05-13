@@ -6,27 +6,21 @@ import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { fetchSubscriptionDataByEmail } from "../utils/utils";
 const templates = [
-  { id: 1, name: "Experience-Basic Start ", image: "/t5.jpg", path: "/template5", isPremium: false, category: "experience" },
+    { id: 2, name: "Experience-Professional Touch", image: "/t10.jpg", path: "/template10", isPremium: true, category: "experience" },
+    {id: 6, name: "Fresher-Professional Touch", image: "/F2.png", path: "/template2", isPremium: true, category: "fresher" },
+
   { id: 5, name: "Fresher-Simple Start", image: "/F1.png", path: "/template1", isPremium: false, category: "fresher" },
+   { id: 3, name: "Experience-Blue Highlight", image: "/t7.jpg", path: "/template7", isPremium: false, category: "experience" },
   { id: 7, name: "Fresher-Highlight", image: "/F4.png", path: "/template3", isPremium: false, category: "fresher" },
-  { id: 3, name: "Experience-Blue Highlight", image: "/t7.jpg", path: "/template7", isPremium: false, category: "experience" },
-  { id: 2, name: "Experience-Professional Touch", image: "/t10.jpg", path: "/template10", isPremium: true, category: "experience" },
-  
-  { id: 6, name: "Fresher-Professional Touch", image: "/F2.png", path: "/template2", isPremium: true, category: "fresher" },
-  
+   { id: 1, name: "Experience-Basic Start ", image: "/t5.jpg", path: "/template5", isPremium: false, category: "experience" },
+
   { id: 4, name: "Experience-Grey Focus", image: "/t9.jpg", path: "/template9", isPremium: true, category: "experience" },
- 
   { id: 8, name: "Fresher-Creative Grey Focus", image: "/F3.png", path: "/template4", isPremium: true, category: "fresher" },
+  { id: 9, name: "Experience-TopPick", image: "/t11.jpg", path: "/template11", isPremium: true, category: "premium" },
+  { id: 10, name: "Fresher-Creative QuickDraft", image: "/t12.jpg", path: "/template12", isPremium: true, category: "premium" },
+  { id: 11, name: "Experience-TopPick", image: "/t13.jpg", path: "/template13", isPremium: true, category: "premium" },
+  { id: 12, name: "Experience-TopPick", image: "/t8.jpg", path: "/template8", isPremium: true, category: "premium" },
 
-
-
-  { id: 9, name: "Experience-TopPick", image: "/r1.jpg", path: "/template11", isPremium: true, category: "premium" },
-  { id: 10, name: "Fresher-Creative QuickDraft", image: "/r1.jpg", path: "/template12", isPremium: true, category: "premium" },
-  { id: 11, name: "Photo", image: "/r1.jpg", path: "/template13", isPremium: true, category: "premium" },
-  { id: 12, name: "Final", image: "/r1.jpg", path: "/template8", isPremium: true, category: "premium" },
-
-  { id: 13, name: "Photo", image: "/r1.jpg", path: "/template6", isPremium: true, category: "creative" },
-  { id: 14, name: "Final", image: "/r1.jpg", path: "/template8", isPremium: true, category: "creative" },
 ];
 
 const filters = ["all", "free", "premium", "fresher", "experience", "creative"];
