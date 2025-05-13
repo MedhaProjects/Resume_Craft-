@@ -31,7 +31,7 @@ const pricingPlans = [
     price: "   ₹199/month",
     priceId: import.meta.env.VITE_STRIPE_PRICE_ID_PRO_MONTHLY,
     features: [
-      "10 Premium Templates",
+      "08 Premium Templates",
       "Advanced ATS Scoring",
       "No Watermark PDFs",
       "Unlimited Edits",
